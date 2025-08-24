@@ -18,6 +18,12 @@ include:
 local:
 macro:
 **************************************************************************************************/
+#define SET_PIXEL_VALUE(IMG, X, Y, COLOR)                                     \
+   SET_VALUE(                                                                 \
+      img->valueData + (Y) * img->rowByteCount + (X) * img->valueByteCount,   \
+      img->valueByteCount,                                                    \
+      COLOR);
+
 #define SET_VALUE(PIXEL, COLOR_BYTE_COUNT, COLOR)              \
    {                                                           \
       Gn1   *___pixel___ = (Gn1 *) (PIXEL);                    \
@@ -58,6 +64,12 @@ macro:
       default: (*___pixel___++) = (COLOR).raw[___index___];    \
       }                                                        \
    }
+
+#define GET_PIXEL_VALUE(IMG, X, Y, COLOR)                                     \
+   GET_VALUE(                                                                 \
+      *(COLOR),                                                               \
+      img->valueByteCount,                                                    \
+      img->valueData + (Y) * img->rowByteCount + (X) * img->valueByteCount)
 
 #define GET_VALUE(COLOR, COLOR_BYTE_COUNT, PIXEL)              \
    {                                                           \
@@ -334,9 +346,9 @@ GIMG_API void gimgDlocContent(Gimg * const img)
 }
 
 /**************************************************************************************************
-func: gimgGetPixel
+func: gimgGetValue
 **************************************************************************************************/
-GIMG_API Gb gimgGetPixel(Gimg const * const img, Gindex const x, Gindex const y,
+GIMG_API Gb gimgGetValue(Gimg const * const img, Gindex const x, Gindex const y,
    GimgValue * const value)
 {
    genter;
@@ -347,11 +359,7 @@ GIMG_API Gb gimgGetPixel(Gimg const * const img, Gindex const x, Gindex const y,
       y < 0  || img->height <= y);
 
    // Find the offset into the pixel array.
-   gmemCopyOverTypeArray(
-      (img->valueData + y * img->rowByteCount + x * img->valueByteCount),
-      Gn1,
-      img->valueByteCount,
-      value);
+   GET_PIXEL_VALUE(img, x, y, value);
 
    greturn gbTRUE;
 }
@@ -480,13 +488,13 @@ GIMG_API Gimg *gimgLoad(Gpath const * const filePath)
                pixel,
                buffer,
                &r, &g, &b, &a);
-            gimgColorCompileRGBA_N1(
+            gimgValueSET_RGBA_N1(
                color,
                N4ToN1(r),
                N4ToN1(g),
                N4ToN1(b),
                N4ToN1(a));
-            gimgSetColorUNSAFE(img, pixel, row, color);
+            SET_PIXEL_VALUE(img, pixel, row, color);
          }
       }
 
@@ -652,14 +660,16 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
 }
 
 /**************************************************************************************************
-func: gimgSetPixelColor
+func: gimgSetValue
 **************************************************************************************************/
-GIMG_API Gb gimgSetPixelColor(Gimg *img, Gindex x, Gindex y, GimgValue value)
+GIMG_API Gb gimgSetValue(Gimg * const img, Gindex const x, Gindex const y, GimgValue const value)
 {
-   SET_VALUE(
-      img->valueByteCount + y * img->rowByteCount + x * img->valueByteCount,
-      img->valueByteCount,
-      value);
+   greturnFalseIf(
+      !img                       ||
+      x < 0  || img->width  <= x ||
+      y < 0  || img->height <= y);
+
+   SET_PIXEL_VALUE(img, y, x, value);
 
    greturn gbTRUE;
 }
@@ -835,7 +845,7 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
    {
       for (iindex = ix, vindex = vx; iindex < iw; iindex++, vindex++)
       {
-         gimgColorDecompileRGBA_N1(
+         gimgValueGET_RGBA_N1(
             vr,
             vg,
             vb,
@@ -845,7 +855,7 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
 
          if (va == 255)
          {
-            gimgColorCompileRGBA_N1(
+            gimgValueSET_RGBA_N1(
                ibuffer[iy * img->width + iindex],
                (Gn1) vr,
                (Gn1) vg,
@@ -854,7 +864,7 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
             continue;
          }
 
-         gimgColorDecompileRGBA_N1(
+         gimgValueGET_RGBA_N1(
             ir,
             ig,
             ib,
@@ -869,7 +879,7 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
          ig = (Gn1) (ipartPercent * ((Gr4) ig) + vpercent * ((Gr4) vg));
          ib = (Gn1) (ipartPercent * ((Gr4) ib) + vpercent * ((Gr4) vb));
 
-         gimgColorCompileRGBA_N1(
+         gimgValueSET_RGBA_N1(
             ibuffer[iy * img->width + iindex],
             (Gn1) ir,
             (Gn1) ig,
@@ -962,8 +972,9 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
             color,
             valueByteCount,
             vValueData + vy * vrowByteCount + vindex * valueByteCount);
-         va = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_A];
-         //gimgColorDecompileRGBA_N1(vr, vg, vb, va, vValueData[vy * value->width + vindex]);
+
+         gimgValueGET_RGBA_N1(vr, vg, vb, va, color);
+
          continueIf(va == 0);
 
          // New pixel is opaque, overwrite the old pixel completely.
@@ -976,26 +987,21 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
             continue;
          }
 
-         vr = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_R];
-         vg = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_G];
-         vb = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_B];
-
          // Calculate the new pixel color by merging the two colors.
          GET_VALUE(color, valueByteCount, iValueData + iy * irowByteCount + iindex * valueByteCount);
-         vr = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_R];
-         vg = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_G];
-         vb = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_B];
-         va = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_A];
+         gimgValueGET_RGBA_N1(ir, ig, ib, ia, color);
 
          vpercent     = ((Gr4) va) / (255.0f);
          ipercent     = ((Gr4) ia) / (255.0f);
          ipartPercent = (1.0f - vpercent) * ipercent;
          percent      = ipartPercent + vpercent;
 
-         color.rn1_gn1_bn1_an1[gimgValueIndexRGB_R] = (Gn1) ((ipartPercent * ((Gr4) ir) + vpercent * ((Gr4) vr)) / percent);
-         color.rn1_gn1_bn1_an1[gimgValueIndexRGB_G] = (Gn1) ((ipartPercent * ((Gr4) ig) + vpercent * ((Gr4) vg)) / percent);
-         color.rn1_gn1_bn1_an1[gimgValueIndexRGB_B] = (Gn1) ((ipartPercent * ((Gr4) ib) + vpercent * ((Gr4) vb)) / percent);
-         color.rn1_gn1_bn1_an1[gimgValueIndexRGB_A] = (Gn1) (255.0f * percent);
+         gimgValueSET_RGBA_N1(
+            color,
+            (Gn1) ((ipartPercent * ((Gr4) ir) + vpercent * ((Gr4) vr)) / percent),
+            (Gn1) ((ipartPercent * ((Gr4) ig) + vpercent * ((Gr4) vg)) / percent),
+            (Gn1) ((ipartPercent * ((Gr4) ib) + vpercent * ((Gr4) vb)) / percent),
+            (Gn1) (255.0f * percent));
 
          SET_VALUE(
             iValueData + iy * irowByteCount + iindex * valueByteCount,
@@ -1075,7 +1081,7 @@ GIMG_API Gb gimgAlphaSetImageAlphaSub(Gimg * const img, Gindex const x,
    {
       for (iindex = ix, vindex = vx; iindex < iw; iindex++, vindex++)
       {
-         gimgColorDecompileRGBA_N1(
+         gimgValueGET_RGBA_N1(
             vr,
             vg,
             vb,
@@ -1085,7 +1091,7 @@ GIMG_API Gb gimgAlphaSetImageAlphaSub(Gimg * const img, Gindex const x,
 
          if (va == 255)
          {
-            gimgColorCompileRGBA_N1(
+            gimgValueSET_RGBA_N1(
                ibuffer[iy * img->width + iindex],
                (Gn1) vr,
                (Gn1) vg,
@@ -1094,7 +1100,7 @@ GIMG_API Gb gimgAlphaSetImageAlphaSub(Gimg * const img, Gindex const x,
             continue;
          }
 
-         gimgColorDecompileRGBA_N1(
+         gimgValueGET_RGBA_N1(
             ir,
             ig,
             ib,
@@ -1107,7 +1113,7 @@ GIMG_API Gb gimgAlphaSetImageAlphaSub(Gimg * const img, Gindex const x,
 
          ia = (Gn1) (255.0f * ipercent);
 
-         gimgColorCompileRGBA_N1(
+         gimgValueSET_RGBA_N1(
             ibuffer[iy * img->width + iindex],
             (Gn1) ir,
             (Gn1) ig,
@@ -1123,12 +1129,19 @@ GIMG_API Gb gimgAlphaSetImageAlphaSub(Gimg * const img, Gindex const x,
 /**************************************************************************************************
 func: gimgSetLine
 **************************************************************************************************/
-GIMG_API Gb gimgSetLine(Gimg * const img, Gindex const x1, Gindex const y1, Gindex const x2,
-   Gindex const y2, GimgValue const p)
+GIMG_API Gb gimgSetLine(Gimg * const img, Gindex const ix1, Gindex const iy1, Gindex const ix2,
+   Gindex const iy2, GimgValue const p)
 {
    GinterpI i;
+   Gindex   x1, x2,
+            y1, y2;
 
    genter;
+
+   x1 = ix1;
+   x2 = ix2;
+   y1 = iy1;
+   y2 = iy2;
 
    // line is visible after the clip.
    if (gimgClipLine(img, &x1, &y1, &x2, &y2))
@@ -1139,16 +1152,11 @@ GIMG_API Gb gimgSetLine(Gimg * const img, Gindex const x1, Gindex const y1, Gind
       // plot the pixels.
       for (; !ginterpIIsDoneHalf(&i); ginterpIGetNext(&i))
       {
-         gimgSetColor(
-            img,
-            ginterpIGetX1(&i),
-            ginterpIGetY1(&i),
-            p);
-         gimgSetColor(
-            img,
-            ginterpIGetX2(&i),
-            ginterpIGetY2(&i),
-            p);
+         // Get the point from the start.
+         SET_PIXEL_VALUE(img, ginterpIGetX1(&i), ginterpIGetY1(&i), p);
+
+         // Get the point from the end.  Lines are symetrical around the middle.
+         SET_PIXEL_VALUE(img, ginterpIGetX2(&i), ginterpIGetY2(&i), p);
       }
 
       greturn gbTRUE;
@@ -1227,11 +1235,11 @@ GIMG_API Gb gimgSetLineHAlpha(Gimg * const img, Gindex const x, Gindex const y, 
    }
 
    // Find the start pixel.
-   buffer = img->valueData + y * img->width + index;
+   buffer = img->valueData + y * img->rowByteCount + index * img->valueByteCount;
    a      = index + gMIN(img->width - index, w);
 
    // color to alpha in.
-   gimgColorDecompileRGBA_N1(cr, cg, cb, ca, color);
+   gimgValueGET_RGBA_N1(cr, cg, cb, ca, color);
    cir = cr * ca;
    cig = cg * ca;
    cib = cb * ca;
@@ -1239,7 +1247,7 @@ GIMG_API Gb gimgSetLineHAlpha(Gimg * const img, Gindex const x, Gindex const y, 
    for (; index < a; index++)
    {
       // Get the existing pixel
-      gimgColorDecompileRGBA_N1(sr, sg, sb, sa, *buffer);
+      gimgValueGET_RGBA_N1(sr, sg, sb, sa, *buffer);
 
       // Merge the colors
       sr = (Gn1) ((((Gi4) sr) * cia + cir) >> 8);
@@ -1247,13 +1255,9 @@ GIMG_API Gb gimgSetLineHAlpha(Gimg * const img, Gindex const x, Gindex const y, 
       sb = (Gn1) ((((Gi4) sb) * cia + cib) >> 8);
 
       // Set the pixel
-      gimgColorCompileRGBA_N1(
-         *buffer,
-         sr,
-         sg,
-         sb,
-         sa);
-      buffer++;
+      gimgValueSET_RGBA_N1(*buffer, sr, sg, sb, sa);
+
+      buffer += img->valueByteCount;
    }
 
    greturn gbTRUE;
@@ -1287,8 +1291,8 @@ GIMG_API Gb gimgSetLineHInterpolate(Gimg * const img, Gindex const x, Gindex con
    w = inw;
 
    // Get the color components of the input.
-   gimgColorDecompileRGBA_N1(ra, ga, ba, aa, pa);
-   gimgColorDecompileRGBA_N1(rb, gb, bb, ab, pb);
+   gimgValueGET_RGBA_N1(ra, ga, ba, aa, pa);
+   gimgValueGET_RGBA_N1(rb, gb, bb, ab, pb);
 
    // Set up the interpolators.
    ginterpISet(&ir, 0, (Gi4) ra, w, (Gi4) rb);
@@ -1307,13 +1311,13 @@ GIMG_API Gb gimgSetLineHInterpolate(Gimg * const img, Gindex const x, Gindex con
    }
 
    // Find the start pixel.
-   buffer = img->valueData + y * img->width + index;
+   buffer = img->valueData + y * img->rowByteCount + index * img->valueByteCount;
    a      = index + gMIN(img->width - index, w);
 
    for (; index < a; index++)
    {
       // Get the current color.
-      gimgColorCompileRGBA_N1(
+      gimgValueSET_RGBA_N1(
          p,
          (Gn1) ginterpIGetY1(&ir),
          (Gn1) ginterpIGetY1(&ig),
@@ -1361,7 +1365,7 @@ GIMG_API Gb gimgSetLineV(Gimg * const img, Gindex const x, Gindex const y, Gcoun
    }
 
    // Set the buffer pointer.
-   buffer    = img->valueData + index * img->width + x;
+   buffer    = img->valueData + index * img->rowByteCount + x * img->valueByteCount;
    a         = index + gMIN(img->height - index, h);
    rowOffset = img->width;
 
@@ -1405,12 +1409,12 @@ GIMG_API Gb gimgSetLineVAlpha(Gimg * const img, Gindex const x, Gindex const y, 
    }
 
    // Set the buffer pointer.
-   buffer    = img->valueData + index * img->width + x;
+   buffer    = img->valueData + index * img->rowByteCount + x * img->valueByteCount;
    a         = index + gMIN(img->height - index, h);
    rowOffset = img->width;
 
    // color to alpha in.
-   gimgColorDecompileRGBA_N1(cr, cg, cb, ca, color);
+   gimgValueGET_RGBA_N1(cr, cg, cb, ca, color);
    cir = cr * ca;
    cig = cg * ca;
    cib = cb * ca;
@@ -1418,7 +1422,7 @@ GIMG_API Gb gimgSetLineVAlpha(Gimg * const img, Gindex const x, Gindex const y, 
    for (; index < a; index++)
    {
       // Get the existing pixel
-      gimgColorDecompileRGBA_N1(sr, sg, sb, sa, *buffer);
+      gimgValueGET_RGBA_N1(sr, sg, sb, sa, *buffer);
 
       // Merge the colors
       sr = (Gn1) ((((Gi4) sr) * cia + cir) >> 8);
@@ -1426,7 +1430,7 @@ GIMG_API Gb gimgSetLineVAlpha(Gimg * const img, Gindex const x, Gindex const y, 
       sb = (Gn1) ((((Gi4) sb) * cia + cib) >> 8);
 
       // Set the color.
-      gimgColorCompileRGBA_N1(*buffer, sr, sg, sb, sa);
+      gimgValueSET_RGBA_N1(*buffer, sr, sg, sb, sa);
       buffer  = buffer + rowOffset;
    }
 
@@ -1462,8 +1466,8 @@ GIMG_API Gb gimgSetLineVInterpolate(Gimg * const img, Gindex const x, Gindex con
    h = inh;
 
    // Get the color components of the input.
-   gimgColorDecompileRGBA_N1(ra, ga, ba, aa, pa);
-   gimgColorDecompileRGBA_N1(rb, gb, bb, ab, pb);
+   gimgValueGET_RGBA_N1(ra, ga, ba, aa, pa);
+   gimgValueGET_RGBA_N1(rb, gb, bb, ab, pb);
 
    // Set up the interpolators.
    ginterpISet(&ir, 0, (Gi4) ra, h, (Gi4) rb);
@@ -1482,14 +1486,14 @@ GIMG_API Gb gimgSetLineVInterpolate(Gimg * const img, Gindex const x, Gindex con
    }
 
    // Set the buffer pointer.
-   buffer    = img->valueData + index * img->width + x;
+   buffer    = img->valueData + index * img->rowByteCount + x * img->valueByteCount;
    a         = index + gMIN(img->height - index, h);
    rowOffset = img->width;
 
    for (; index < a; index++)
    {
       // Get the current color.
-      gimgColorCompileRGBA_N1(
+      gimgValueSET_RGBA_N1(
          p,
          (Gn1) ginterpIGetY1(&ir),
          (Gn1) ginterpIGetY1(&ig),
@@ -1658,8 +1662,8 @@ GIMG_API Gb gimgSetRectFillInterpolateH(Gimg * const img, Gindex const x, Gindex
    w = inw;
 
    // Get the color components of the input.
-   gimgColorDecompileRGBA_N1(ra, ga, ba, aa, pa);
-   gimgColorDecompileRGBA_N1(rb, gb, bb, ab, pb);
+   gimgValueGET_RGBA_N1(ra, ga, ba, aa, pa);
+   gimgValueGET_RGBA_N1(rb, gb, bb, ab, pb);
 
    // Set up the interpolators.
    ginterpISet(&ir, 0, (Gi4) ra, w, (Gi4) rb);
@@ -1683,7 +1687,7 @@ GIMG_API Gb gimgSetRectFillInterpolateH(Gimg * const img, Gindex const x, Gindex
    for (; index < a; index++)
    {
       // Get the current color.
-      gimgColorCompileRGBA_N1(
+      gimgValueSET_RGBA_N1(
          p,
          (Gn1) ginterpIGetY1(&ir),
          (Gn1) ginterpIGetY1(&ig),
@@ -1729,8 +1733,8 @@ GIMG_API Gb gimgSetRectFillInterpolateV(Gimg * const img, Gindex const x, Gindex
    h = inh;
 
    // Get the color components of the input.
-   gimgColorDecompileRGBA_N1(ra, ga, ba, aa, pa);
-   gimgColorDecompileRGBA_N1(rb, gb, bb, ab, pb);
+   gimgValueGET_RGBA_N1(ra, ga, ba, aa, pa);
+   gimgValueGET_RGBA_N1(rb, gb, bb, ab, pb);
 
    // Set up the interpolators.
    ginterpISet(&ir, 0, (Gi4) ra, h, (Gi4) rb);
@@ -1754,7 +1758,7 @@ GIMG_API Gb gimgSetRectFillInterpolateV(Gimg * const img, Gindex const x, Gindex
    for (; index < a; index++)
    {
       // Get the current color.
-      gimgColorCompileRGBA_N1(
+      gimgValueSET_RGBA_N1(
          p,
          (Gn1) ginterpIGetY1(&ir),
          (Gn1) ginterpIGetY1(&ig),
@@ -1849,7 +1853,7 @@ GIMG_API Gb gimgStore(Gimg const * const img, Gpath const * const filePath, Gr c
       forCount(pixel, gimgGetWidth(img))
       {
          gimgGetColor(img, pixel, row, &color);
-         gimgColorDecompileRGBA_N1(
+         gimgValueGET_RGBA_N1(
             buffer[pixel * 4 + 0],
             buffer[pixel * 4 + 1],
             buffer[pixel * 4 + 2],
@@ -1914,23 +1918,32 @@ func: gimgSwapColor
 GIMG_API Gb gimgSwapColor(Gimg * const img, GimgValue const originalColor,
    GimgValue const newColor)
 {
-   Gindex       index;
-   Gcount       count;
-   GimgValue   *ibuffer;
+   Gindex    index;
+   Gcount    count,
+             valueByteCount;
+   Gn1      *ibuffer;
+   GimgValue value;
 
    genter;
 
    greturnFalseIf(!img);
 
-   count   = img->width * img->height;
-   ibuffer = gimgGetBuffer(img);
+   gmemClearType(&value, GimgValue);
+
+   valueByteCount = img->valueByteCount;
+   count          = img->width * img->height;
+   ibuffer        = img->valueData;
 
    for (index = 0; index < count; index++)
    {
-      if (ibuffer[index].color == originalColor.color)
+      GET_VALUE(value, valueByteCount, ibuffer);
+
+      if (gmemIsEqual(&value, &originalColor, valueByteCount))
       {
-         ibuffer[index] = newColor;
+         SET_VALUE(ibuffer, valueByteCount, newColor);
       }
+
+      ibuffer += valueByteCount;
    }
 
    greturn gbTRUE;
@@ -1985,10 +1998,10 @@ static Gb _ResizeFixedRGBA(Gimg const * const simage, Gimg * const dimage)
 
    genter;
 
-   sw = gimgGetWidth( simage);
-   sh = gimgGetHeight(simage);
-   dw = gimgGetWidth( dimage);
-   dh = gimgGetHeight(dimage);
+   sw = simage->width;
+   sh = simage->height;
+   dw = dimage->width;
+   dh = dimage->height;
 
    sampleX     = sw / dw;
    sampleY     = sh / dh;
@@ -2008,8 +2021,8 @@ static Gb _ResizeFixedRGBA(Gimg const * const simage, Gimg * const dimage)
          {
             forCount(sx, sampleX)
             {
-               gimgGetPixel(simage, dx * sampleX + sx, dy * sampleY + sy, &p);
-               gimgColorDecompileRGBA_N1(r, g, b, a, p);
+               GET_PIXEL_VALUE(simage, dx, dy, &p);
+               gimgValueGET_RGBA_N1(r, g, b, a, p);
 
                if (a == 0)
                {
@@ -2041,17 +2054,8 @@ static Gb _ResizeFixedRGBA(Gimg const * const simage, Gimg * const dimage)
             suma /= sampleCount;
          }
 
-         gimgColorCompileRGBA_N1(
-            p,
-            (Gn1) sumr,
-            (Gn1) sumg,
-            (Gn1) sumb,
-            (Gn1) suma);
-         gimgSetColorUNSAFE(
-            dimage,
-            dx,
-            dy,
-            p);
+         gimgValueSET_RGBA_N1(p, sumr, sumg, sumb, suma);
+         SET_PIXEL_VALUE(dimage, dx,dy, p);
       }
    }
 
@@ -2079,13 +2083,13 @@ static void _SetCirclePixels(Gimg * const img, Gindex const x, Gindex const y,
    Gindex const xx, Gindex const yy, GimgValue const color, Gb const isEven)
 {
    genter;
-   gimgSetPixelColor(img, x + xx + isEven, y + yy + isEven, color);
-   gimgSetPixelColor(img, x + yy + isEven, y + xx + isEven, color);
-   gimgSetPixelColor(img, x + yy + isEven, y - xx,          color);
-   gimgSetPixelColor(img, x + xx + isEven, y - yy,          color);
-   gimgSetPixelColor(img, x - xx,          y - yy,          color);
-   gimgSetPixelColor(img, x - yy,          y - xx,          color);
-   gimgSetPixelColor(img, x - yy,          y + xx + isEven, color);
-   gimgSetPixelColor(img, x - xx,          y + yy + isEven, color);
+   gimgSetValue(img, x + xx + isEven, y + yy + isEven, color);
+   gimgSetValue(img, x + yy + isEven, y + xx + isEven, color);
+   gimgSetValue(img, x + yy + isEven, y - xx,          color);
+   gimgSetValue(img, x + xx + isEven, y - yy,          color);
+   gimgSetValue(img, x - xx,          y - yy,          color);
+   gimgSetValue(img, x - yy,          y - xx,          color);
+   gimgSetValue(img, x - yy,          y + xx + isEven, color);
+   gimgSetValue(img, x - xx,          y + yy + isEven, color);
    greturn;
 }
