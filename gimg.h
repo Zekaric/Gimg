@@ -58,43 +58,43 @@ typedef enum
 {
    gimgTypeNONE,
 
-   gimgTypeKN1,
-   gimgTypeKN2,
-   gimgTypeKN4,
-   gimgTypeKN8,
-   gimgTypeKR4,
-   gimgTypeKR8,
-   gimgTypeKN1_AN1,
-   gimgTypeKN2_AN2,
-   gimgTypeKN4_AN4,
-   gimgTypeKN8_AN8,
-   gimgTypeKR4_AR4,
-   gimgTypeKR8_AR8,
-   gimgTypeRN1_GN1_BN1,          // 24 bit
-   gimgTypeRN2_GN2_BN2,
-   gimgTypeRN4_GN4_BN4,
-   gimgTypeRN8_GN8_BN8,
-   gimgTypeRR4_GR4_BR4,
-   gimgTypeRR8_GR8_BR8,
-   gimgTypeRN1_GN1_BN1_AN1,      // 32 bit
-   gimgTypeRN2_GN2_BN2_AN2,
-   gimgTypeRN4_GN4_BN4_AN4,
-   gimgTypeRN8_GN8_BN8_AN8,
-   gimgTypeRR4_GR4_BR4_AR4,
-   gimgTypeRR8_GR8_BR8_AR8,
+   gimgTypeKN1,                  // Gray,           8 bit,  1 byte
+   gimgTypeKN2,                  // Gray,          16 bit,  2 byte
+   gimgTypeKN4,                  // Gray,          32 bit,  4 byte
+   gimgTypeKN8,                  // Gray,          64 bit,  8 byte
+   gimgTypeKR4,                  // Gray,                   4 byte
+   gimgTypeKR8,                  // Gray,                   8 byte
+   gimgTypeKN1_AN1,              // Gray  + Alhpa,          2 byte
+   gimgTypeKN2_AN2,              // Gray  + Alhpa,          4 byte
+   gimgTypeKN4_AN4,              // Gray  + Alhpa,          8 byte
+   gimgTypeKN8_AN8,              // Gray  + Alhpa,         16 byte
+   gimgTypeKR4_AR4,              // Gray  + Alhpa,          8 byte
+   gimgTypeKR8_AR8,              // Gray  + Alhpa,         16 byte
+   gimgTypeRN1_GN1_BN1,          // Color,         24 bit,  3 byte
+   gimgTypeRN2_GN2_BN2,          // Color,                  6 byte
+   gimgTypeRN4_GN4_BN4,          // Color,                 12 byte
+   gimgTypeRN8_GN8_BN8,          // Color,                 24 byte
+   gimgTypeRR4_GR4_BR4,          // Color,                 12 byte
+   gimgTypeRR8_GR8_BR8,          // Color,                 24 byte
+   gimgTypeRN1_GN1_BN1_AN1,      // Color + Alhpa, 32 bit,  4 byte
+   gimgTypeRN2_GN2_BN2_AN2,      // Color + Alhpa,          8 byte
+   gimgTypeRN4_GN4_BN4_AN4,      // Color + Alhpa,         16 byte
+   gimgTypeRN8_GN8_BN8_AN8,      // Color + Alhpa,         32 byte
+   gimgTypeRR4_GR4_BR4_AR4,      // Color + Alhpa,         16 byte
+   gimgTypeRR8_GR8_BR8_AR8,      // Color + Alhpa,         32 byte
    gimgTypePOINTER
 } GimgType;
 
 typedef enum
 {
-   gimgValueK_K_INDEX   = 0,
-   gimgValueK_A_INDEX   = 1,
+   gimgValueIndexK_K   = 0,
+   gimgValueIndexK_A   = 1,
 
-   gimgValueRGB_R_INDEX = 0,
-   gimgValueRGB_G_INDEX = 1,
-   gimgValueRGB_B_INDEX = 2,
-   gimgValueRGB_A_INDEX = 3,
-};
+   gimgValueIndexRGB_R = 0,
+   gimgValueIndexRGB_G = 1,
+   gimgValueIndexRGB_B = 2,
+   gimgValueIndexRGB_A = 3,
+} GimgValueIndex;
 
 typedef struct _Gimg Gimg;
 struct _Gimg
@@ -111,7 +111,8 @@ struct _Gimg
 
 typedef union
 {
-   Gn1                n1[4];              // raw access.
+   Gn1                raw[32];            // raw access.
+   Gn1                n1[4];
    Gn2                n2[4];
    Gn4                n4[4];
    Gn8                n8[4];
@@ -152,7 +153,7 @@ typedef union
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-#define gimgCloc(VALUE_TYPE, W, H)               (Gimg *) gleakCreate((void *) gimgCloc_(VALUE_TYPE, W, H), gsizeof(Gimg))
+#define gimgCloc(VALUE_TYPE, W, H)                 (Gimg *) gleakCreate((void *) gimgCloc_(VALUE_TYPE, W, H), gsizeof(Gimg))
 
 #define gimgGAMMAf                                 2.2f
 #define gimgGAMMA                                  2.2

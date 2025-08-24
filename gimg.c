@@ -16,176 +16,89 @@ include:
 
 /**************************************************************************************************
 local:
-type:
+macro:
 **************************************************************************************************/
-#pragma pack(push, 1)
+#define SET_VALUE(PIXEL, COLOR_BYTE_COUNT, COLOR)              \
+   {                                                           \
+      Gn1   *___pixel___ = (Gn1 *) (PIXEL);                    \
+      Gindex ___index___ = 0;                                  \
+      switch (COLOR_BYTE_COUNT)                                \
+      {                                                        \
+      case 32: (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+      case 24: (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+      case 16: (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+      case 12: (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+      case 8:  (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+               (*___pixel___++) = (COLOR).raw[___index___];    \
+      case 4:  (*___pixel___++) = (COLOR).raw[___index___];    \
+      case 3:  (*___pixel___++) = (COLOR).raw[___index___];    \
+      case 2:  (*___pixel___++) = (COLOR).raw[___index___];    \
+      default: (*___pixel___++) = (COLOR).raw[___index___];    \
+      }                                                        \
+   }
 
-typedef struct
-{
-   Gn1  k;
-} ValueKN1;
-
-typedef struct
-{
-   Gn2  k;
-} ValueKN2;
-
-typedef struct
-{
-   Gn4  k;
-} ValueKN4;
-
-typedef struct
-{
-   Gn8  k;
-} ValueKN8;
-
-typedef struct
-{
-   Gr4  k;
-} ValueKR4;
-
-typedef struct
-{
-   Gr8  k;
-} ValueKR8;
-
-
-typedef struct
-{
-   Gn1  k;
-   Gn1  a;
-} ValueKAN1;
-
-typedef struct
-{
-   Gn2  k;
-   Gn2  a;
-} ValueKAN2;
-
-typedef struct
-{
-   Gn4  k;
-   Gn4  a;
-} ValueKAN4;
-
-typedef struct
-{
-   Gn8  k;
-   Gn8  a;
-} ValueKAN8;
-
-typedef struct
-{
-   Gr4  k;
-   Gr4  a;
-} ValueKAR4;
-
-typedef struct
-{
-   Gr8  k;
-   Gr8  a;
-} ValueKAR8;
-
-
-typedef struct
-{
-   Gn1  r;
-   Gn1  g;
-   Gn1  b;
-} ValueRGBN1;
-
-typedef struct
-{
-   Gn2  r;
-   Gn2  g;
-   Gn2  b;
-} ValueRGBN2;
-
-typedef struct
-{
-   Gn4  r;
-   Gn4  g;
-   Gn4  b;
-} ValueRGBN4;
-
-typedef struct
-{
-   Gn8  r;
-   Gn8  g;
-   Gn8  b;
-} ValueRGBN8;
-
-typedef struct
-{
-   Gr4  r;
-   Gr4  g;
-   Gr4  b;
-} ValueRGBR4;
-
-typedef struct
-{
-   Gr8  r;
-   Gr8  g;
-   Gr8  b;
-} ValueRGBR8;
-
-
-typedef struct
-{
-   Gn1  r;
-   Gn1  g;
-   Gn1  b;
-   Gn1  a;
-} ValueRGBAN1;
-
-typedef struct
-{
-   Gn2  r;
-   Gn2  g;
-   Gn2  b;
-   Gn2  a;
-} ValueRGBAN2;
-
-typedef struct
-{
-   Gn4  r;
-   Gn4  g;
-   Gn4  b;
-   Gn4  a;
-} ValueRGBAN4;
-
-typedef struct
-{
-   Gn8  r;
-   Gn8  g;
-   Gn8  b;
-   Gn8  a;
-} ValueRGBAN8;
-
-typedef struct
-{
-   Gr4  r;
-   Gr4  g;
-   Gr4  b;
-   Gr4  a;
-} ValueRGBAR4;
-
-typedef struct
-{
-   Gr8  r;
-   Gr8  g;
-   Gr8  b;
-   Gr8  a;
-} ValueRGBAR8;
-
-
-typedef struct
-{
-   Gp  *p;
-} ValuePOINTER;
-
-#pragma pack(pop)
+#define GET_VALUE(COLOR, COLOR_BYTE_COUNT, PIXEL)              \
+   {                                                           \
+      Gn1   *___pixel___ = (Gn1 *) (PIXEL);                    \
+      Gindex ___index___ = 0;                                  \
+      switch (COLOR_BYTE_COUNT)                                \
+      {                                                        \
+      case 32: (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+      case 24: (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+      case 16: (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+      case 12: (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+      case 8:  (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+               (COLOR).raw[___index___] = (*___pixel___++);    \
+      case 4:  (COLOR).raw[___index___] = (*___pixel___++);    \
+      case 3:  (COLOR).raw[___index___] = (*___pixel___++);    \
+      case 2:  (COLOR).raw[___index___] = (*___pixel___++);    \
+      default: (COLOR).raw[___index___] = (*___pixel___++);    \
+      }                                                        \
+   }
 
 /**************************************************************************************************
 variable:
@@ -741,23 +654,13 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
 /**************************************************************************************************
 func: gimgSetPixelColor
 **************************************************************************************************/
-GIMG_API Gb gimgSetPixelColor(Gimg *img, Gindex x, Gindex y, GimgValue p)
+GIMG_API Gb gimgSetPixelColor(Gimg *img, Gindex x, Gindex y, GimgValue value)
 {
-#if 0
-   GimgValue *buffer;
+   SET_VALUE(
+      img->valueByteCount + y * img->rowByteCount + x * img->valueByteCount,
+      img->valueByteCount,
+      value);
 
-   genter;
-
-   greturnFalseIf(
-      !image ||
-      x < 0  || img->width  <= x ||
-      y < 0  || img->height <= y);
-
-   buffer = imageBUFFER(image);
-
-   // Find the offset into the pixel array.
-   *(buffer + y * img->width + x) = p;
-#endif
    greturn gbTRUE;
 }
 
@@ -766,20 +669,24 @@ func: gimgSetClear
 **************************************************************************************************/
 GIMG_API Gb gimgSetClear(Gimg * const img, GimgValue const color)
 {
-   Gindex     index;
-   Gcount     count;
-   GimgValue *cp;
+   Gindex     indexPixel;
+   Gcount     countPixel,
+              countColor;
+   Gn1       *imagePointer;
 
    genter;
 
    greturnFalseIf(!img);
 
-   cp    = img->valueData;
-   count = img->height * img->width;
-   forCount(index, count)
+   // For all pixels...
+   imagePointer = img->valueData;
+   countPixel   = img->height * img->width;
+   countColor   = img->valueByteCount;
+
+   forCount(indexPixel, countPixel)
    {
-      *cp = color;
-      cp++;
+      SET_VALUE(imagePointer, countColor, color);
+      imagePointer = imagePointer + countColor;
    }
 
    greturn gbTRUE;
@@ -797,25 +704,32 @@ GIMG_API Gb gimgSetImage(Gimg * const img, Gindex const x, Gindex const y, Gimg 
    Gcount     iw,
               ih,
               vw,
-              vh;
-   GimgValue *ibuffer,
-             *vbuffer;
+              vh,
+              valueByteCount;
+   Gn1       *iValueData,
+             *vValueData;
 
    genter;
 
    greturnFalseIf(
-      !img                  ||
-      !value                ||
+      !img                                         ||
+      !value                                       ||
+      img->valueType != value->valueType           ||
+      !(img->valueType == gimgTypeKN1           ||
+        img->valueType == gimgTypeKN1_AN1       ||
+        img->valueType == gimgTypeRN1_GN1_BN1   ||
+        img->valueType == gimgTypeRN1_GN1_BN1_AN1) ||
       x + value->width  < 0 || img->width  - 1 < x ||
       y + value->height < 0 || img->height - 1 < y);
 
-   ibuffer = gimgGetBuffer(img);
-   vbuffer = gimgGetBuffer(value);
+   valueByteCount = img->valueByteCount;
+   iValueData     = img->valueData;
+   vValueData     = value->valueData;
 
-   vx = 0;
-   vy = 0;
-   vw = value->width;
-   vh = value->height;
+   vx             = 0;
+   vy             = 0;
+   vw             = value->width;
+   vh             = value->height;
 
    // Clip off the under flow
    ix = x;
@@ -843,17 +757,18 @@ GIMG_API Gb gimgSetImage(Gimg * const img, Gindex const x, Gindex const y, Gimg 
    for (; iy < ih; iy++, vy++)
    {
       gmemCopyOverTypeArrayAt(
-         vbuffer,
-         GimgValue,
-         vw,
-         vy * value->width + vx,
-         ibuffer,
-         iy * img->width + ix);
+         vValueData,
+         Gn,
+         vw                       * valueByteCount,
+         (vy * value->width + vx) * valueByteCount,
+         iValueData,
+         (iy * img->width   + ix) * valueByteCount);
    }
 
    greturn gbTRUE;
 }
 
+#if 0
 /**************************************************************************************************
 func: gimgSetImageAlpha
 **************************************************************************************************/
@@ -864,24 +779,29 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
               vx, vy,
               iindex, vindex;
    Gcount     iw, ih,
-              vw, vh;
+              vw, vh,
+              valueByteCount;
    Gn1        vr, vg, vb, va,
               ir, ig, ib, ia;
-   GimgValue *ibuffer,
-             *vbuffer;
+   Gn1       *iValueData,
+             *vValueData;
    Gr4        vpercent,
               ipartPercent;
 
    genter;
 
    greturnFalseIf(
-      !img                  ||
-      !value                ||
+      !img                                         ||
+      !value                                       ||
+      img->valueType != value->valueType           ||
+      !(img->valueType == gimgTypeKN1_AN1       ||
+        img->valueType == gimgTypeRN1_GN1_BN1_AN1) ||
       x + value->width  < 0 || img->width  - 1 < x ||
       y + value->height < 0 || img->height - 1 < y);
 
-   ibuffer = gimgGetBuffer(img);
-   vbuffer = gimgGetBuffer(value);
+   valueByteCount = img->valueByteCount;
+   iValueData     = img->valueData;
+   vValueData     = value->valueData;
 
    vx = 0;
    vy = 0;
@@ -959,46 +879,57 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
    }
 
    greturn gbTRUE;
+   greturn gbFALSE;
 }
+#endif
 
 /**************************************************************************************************
-func: gimgAlphaSetImageAlpha
+func: gimgSetImageAlpha
 
 Destination is an alphaed image.  Source image is an alphaed image.  Final
 image will still be an alphaed image.
 **************************************************************************************************/
-GIMG_API Gb gimgAlphaSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
+GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
    Gimg const * const value)
 {
    Gindex     ix, iy,
               vx, vy,
               iindex, vindex;
    Gcount     iw, ih,
-              vw, vh;
+              vw, vh,
+              valueByteCount,
+              irowByteCount,
+              vrowByteCount;
    Gn1        vr, vg, vb, va,
               ir, ig, ib, ia;
-   GimgValue *ibuffer,
-             *vbuffer;
+   Gn1       *iValueData,
+             *vValueData;
    Gr4        vpercent,
               ipercent,
               ipartPercent,
               percent;
+   GimgValue  color;
 
    genter;
 
    greturnFalseIf(
-      !img                  ||
-      !value                ||
+      !img                                         ||
+      !value                                       ||
+      img->valueType != value->valueType           ||
+      !(img->valueType == gimgTypeRN1_GN1_BN1_AN1) ||
       x + value->width  < 0 || img->width  - 1 < x ||
       y + value->height < 0 || img->height - 1 < y);
 
-   ibuffer = gimgGetBuffer(img);
-   vbuffer = gimgGetBuffer(value);
+   irowByteCount  = img->rowByteCount;
+   vrowByteCount  = value->rowByteCount;
+   valueByteCount = img->valueByteCount;
+   iValueData     = img->valueData;
+   vValueData     = value->valueData;
 
-   vx = 0;
-   vy = 0;
-   vw = value->width;
-   vh = value->height;
+   vx             = 0;
+   vy             = 0;
+   vw             = value->width;
+   vh             = value->height;
 
    // Clip off the under flow
    ix = x;
@@ -1027,55 +958,56 @@ GIMG_API Gb gimgAlphaSetImageAlpha(Gimg * const img, Gindex const x, Gindex cons
    {
       for (iindex = ix, vindex = vx; iindex < iw; iindex++, vindex++)
       {
-         gimgColorDecompileRGBA_N1(
-            vr,
-            vg,
-            vb,
-            va,
-            vbuffer[vy * value->width + vindex]);
+         GET_VALUE(
+            color,
+            valueByteCount,
+            vValueData + vy * vrowByteCount + vindex * valueByteCount);
+         va = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_A];
+         //gimgColorDecompileRGBA_N1(vr, vg, vb, va, vValueData[vy * value->width + vindex]);
          continueIf(va == 0);
 
+         // New pixel is opaque, overwrite the old pixel completely.
          if (va == 255)
          {
-            gimgColorCompileRGBA_N1(
-               ibuffer[iy * img->width + iindex],
-               (Gn1) vr,
-               (Gn1) vg,
-               (Gn1) vb,
-               (Gn1) va);
+            SET_VALUE(
+               iValueData + iy * irowByteCount + iindex * valueByteCount,
+               valueByteCount,
+               color);
             continue;
          }
 
-         gimgColorDecompileRGBA_N1(
-            ir,
-            ig,
-            ib,
-            ia,
-            ibuffer[iy * img->width + iindex]);
+         vr = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_R];
+         vg = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_G];
+         vb = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_B];
 
-         // Merge the colors
+         // Calculate the new pixel color by merging the two colors.
+         GET_VALUE(color, valueByteCount, iValueData + iy * irowByteCount + iindex * valueByteCount);
+         vr = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_R];
+         vg = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_G];
+         vb = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_B];
+         va = color.rn1_gn1_bn1_an1[gimgValueIndexRGB_A];
+
          vpercent     = ((Gr4) va) / (255.0f);
          ipercent     = ((Gr4) ia) / (255.0f);
          ipartPercent = (1.0f - vpercent) * ipercent;
          percent      = ipartPercent + vpercent;
 
-         ir = (Gn1) ((ipartPercent * ((Gr4) ir) + vpercent * ((Gr4) vr)) / percent);
-         ig = (Gn1) ((ipartPercent * ((Gr4) ig) + vpercent * ((Gr4) vg)) / percent);
-         ib = (Gn1) ((ipartPercent * ((Gr4) ib) + vpercent * ((Gr4) vb)) / percent);
-         ia = (Gn1) (255.0f * percent);
+         color.rn1_gn1_bn1_an1[gimgValueIndexRGB_R] = (Gn1) ((ipartPercent * ((Gr4) ir) + vpercent * ((Gr4) vr)) / percent);
+         color.rn1_gn1_bn1_an1[gimgValueIndexRGB_G] = (Gn1) ((ipartPercent * ((Gr4) ig) + vpercent * ((Gr4) vg)) / percent);
+         color.rn1_gn1_bn1_an1[gimgValueIndexRGB_B] = (Gn1) ((ipartPercent * ((Gr4) ib) + vpercent * ((Gr4) vb)) / percent);
+         color.rn1_gn1_bn1_an1[gimgValueIndexRGB_A] = (Gn1) (255.0f * percent);
 
-         gimgColorCompileRGBA_N1(
-            ibuffer[iy * img->width + iindex],
-            (Gn1) ir,
-            (Gn1) ig,
-            (Gn1) ib,
-            (Gn1) ia);
+         SET_VALUE(
+            iValueData + iy * irowByteCount + iindex * valueByteCount,
+            valueByteCount,
+            color);
       }
    }
 
    greturn gbTRUE;
 }
 
+#if 0
 /**************************************************************************************************
 func: gimgAlphaSetImageAlphaSub
 
@@ -1186,6 +1118,7 @@ GIMG_API Gb gimgAlphaSetImageAlphaSub(Gimg * const img, Gindex const x,
 
    greturn gbTRUE;
 }
+#endif
 
 /**************************************************************************************************
 func: gimgSetLine
