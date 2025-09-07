@@ -18,117 +18,173 @@ include:
 local:
 macro:
 **************************************************************************************************/
-#define SET_PIXEL_VALUE(IMG, X, Y, COLOR)                                     \
-   SET_VALUE(                                                                 \
-      img->valueData + (Y) * img->rowByteCount + (X) * img->valueByteCount,   \
-      img->valueByteCount,                                                    \
+#define SET_PIXEL_VALUE(IMG, X, Y, COLOR)                                                          \
+   SET_VALUE(                                                                                      \
+      IMG->valueData + (Y) * IMG->rowByteCount + (X) * IMG->valueByteCount,                        \
+      IMG->valueByteCount,                                                                         \
       COLOR);
 
-#define SET_VALUE(PIXEL, COLOR_BYTE_COUNT, COLOR)              \
-   {                                                           \
-      Gn1   *___pixel___ = (Gn1 *) (PIXEL);                    \
-      Gindex ___index___ = 0;                                  \
-      switch (COLOR_BYTE_COUNT)                                \
-      {                                                        \
-      case 32: (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-      case 24: (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-      case 16: (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-      case 12: (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-      case 8:  (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-               (*___pixel___++) = (COLOR).raw[___index___];    \
-      case 4:  (*___pixel___++) = (COLOR).raw[___index___];    \
-      case 3:  (*___pixel___++) = (COLOR).raw[___index___];    \
-      case 2:  (*___pixel___++) = (COLOR).raw[___index___];    \
-      default: (*___pixel___++) = (COLOR).raw[___index___];    \
-      }                                                        \
+#define SET_VALUE(PIXEL, COLOR_BYTE_COUNT, COLOR)                                                  \
+   {                                                                                               \
+      Gn1   *___pixel___ = (Gn1 *) (PIXEL);                                                        \
+      Gindex ___index___ = 0;                                                                      \
+      switch (COLOR_BYTE_COUNT)                                                                    \
+      {                                                                                            \
+      case 32: (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      case 24: (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      case 16: (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      case 12: (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      case 8:  (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+               (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      case 4:  (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      case 3:  (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      case 2:  (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      default: (*___pixel___++) = (COLOR).raw[___index___++];                                      \
+      }                                                                                            \
    }
 
-#define GET_PIXEL_VALUE(IMG, X, Y, COLOR)                                     \
-   GET_VALUE(                                                                 \
-      *(COLOR),                                                               \
-      img->valueByteCount,                                                    \
-      img->valueData + (Y) * img->rowByteCount + (X) * img->valueByteCount)
+#define GET_PIXEL_VALUE(IMG, X, Y, COLOR)                                                          \
+   GET_VALUE(                                                                                      \
+      *(COLOR),                                                                                    \
+      IMG->valueByteCount,                                                                         \
+      IMG->valueData + (Y) * IMG->rowByteCount + (X) * IMG->valueByteCount)
 
-#define GET_VALUE(COLOR, COLOR_BYTE_COUNT, PIXEL)              \
-   {                                                           \
-      Gn1   *___pixel___ = (Gn1 *) (PIXEL);                    \
-      Gindex ___index___ = 0;                                  \
-      switch (COLOR_BYTE_COUNT)                                \
-      {                                                        \
-      case 32: (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-      case 24: (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-      case 16: (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-      case 12: (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-      case 8:  (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-               (COLOR).raw[___index___] = (*___pixel___++);    \
-      case 4:  (COLOR).raw[___index___] = (*___pixel___++);    \
-      case 3:  (COLOR).raw[___index___] = (*___pixel___++);    \
-      case 2:  (COLOR).raw[___index___] = (*___pixel___++);    \
-      default: (COLOR).raw[___index___] = (*___pixel___++);    \
-      }                                                        \
+#define GET_VALUE(COLOR, COLOR_BYTE_COUNT, PIXEL)                                                  \
+   {                                                                                               \
+      Gn1   *___pixel___ = (Gn1 *) (PIXEL);                                                        \
+      Gindex ___index___ = 0;                                                                      \
+      switch (COLOR_BYTE_COUNT)                                                                    \
+      {                                                                                            \
+      case 32: (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      case 24: (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      case 16: (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      case 12: (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      case 8:  (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+               (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      case 4:  (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      case 3:  (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      case 2:  (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      default: (COLOR).raw[___index___++] = (*___pixel___++);                                      \
+      }                                                                                            \
    }
+
+#define VALUE_TO_RGBA_N1(TYPE, COLOR)                                                              \
+   {                                                                                               \
+      switch (TYPE)                                                                                \
+      {                                                                                            \
+      default:                                                                                     \
+      case gimgTypeRN1_GN1_BN1_AN1:                                                                \
+         /* Nothing to do */                                                                       \
+         break;                                                                                    \
+                                                                                                   \
+      case gimgTypeKN1:                                                                            \
+         /* Need to set A to 255. */                                                               \
+         (COLOR).n1[gimgValueIndexRGB_A]    = 255;                                                 \
+         /* Need to duplicate K over GB.  R and K are the same location */                         \
+         (COLOR).n1[gimgValueIndexRGB_G]    =                                                      \
+            (COLOR).n1[gimgValueIndexRGB_B] = (COLOR).n1[gimgValueIndexK_K];                       \
+         break;                                                                                    \
+                                                                                                   \
+      case gimgTypeKN1_AN1:                                                                        \
+         /* Need to move A first. */                                                               \
+         (COLOR).n1[gimgValueIndexRGB_A]    = (COLOR).n1[gimgValueIndexK_A];                       \
+         /* Need to duplicate K over GB.  R and K are the same location */                         \
+         (COLOR).n1[gimgValueIndexRGB_G]    =                                                      \
+            (COLOR).n1[gimgValueIndexRGB_B] = (COLOR).n1[gimgValueIndexK_K];                       \
+         break;                                                                                    \
+                                                                                                   \
+      case gimgTypeRN1_GN1_BN1:                                                                    \
+         /* Need to set A to 255. */                                                               \
+         (COLOR).n1[gimgValueIndexRGB_A]    = 255;                                                 \
+         /* RGB are in the same location as RGB in RGBA. */                                        \
+         break;                                                                                    \
+      }                                                                                            \
+   }
+
+#define VALUE_FROM_RGBA_N1(TYPE, COLOR)                                                            \
+   {                                                                                               \
+      GimgValue ___v___;                                                                           \
+      switch (TYPE)                                                                                \
+      {                                                                                            \
+      default:                                                                                     \
+      case gimgTypeKN1:                                                                            \
+      case gimgTypeRN1_GN1_BN1:                                                                    \
+      case gimgTypeRN1_GN1_BN1_AN1:                                                                \
+         /* Nothing to do R and K are at the same location, RGB are at the same location */        \
+         break;                                                                                    \
+                                                                                                   \
+      case gimgTypeKN1_AN1:                                                                        \
+         /* R and K are at the same location.  A needs to move over. */                            \
+         (COLOR).kn1_an1[gimgValueIndexK_A] = ___v___.n1[gimgValueIndexRGB_A];                     \
+         break;                                                                                    \
+      }                                                                                            \
+   }
+
 
 /**************************************************************************************************
 variable:
 **************************************************************************************************/
 static Gb    _isStarted = gbFALSE;
-static Gr4   _percentTableN1[256];
-static Gr4   _gammaTableN1[256];
+static Gr    _percentTableN1[256];
+static Gr    _gammaTableN1[256];
 
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-static Gb    _ResizeFixedK(   Gimg const * const simage, Gimg * const dimage);
-static Gb    _ResizeFixedKA(  Gimg const * const simage, Gimg * const dimage);
-static Gb    _ResizeFixedRGB( Gimg const * const simage, Gimg * const dimage);
-static Gb    _ResizeFixedRGBA(Gimg const * const simage, Gimg * const dimage);
-
-static void  _SetCircleLines( Gimg       * const img, Gindex const x, Gindex const y, Gindex const xx, Gindex const yy, GimgValue const color, Gb const isEven);
-static void  _SetCirclePixels(Gimg       * const img, Gindex const x, Gindex const y, Gindex const xx, Gindex const yy, GimgValue const color, Gb const isEven);
+#if 0
+static void  _SetCirclePixelsEven(     Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, Gindex const index, Gindex const step, GimgValue const color);
+static void  _SetCirclePixelsOdd(      Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, Gindex const index, Gindex const step, GimgValue const color);
+static void  _SetCircleLinesOddFirst(  Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, GimgValue const color);
+static void  _SetCircleLines(          Gimg       * const img, Gindex const x, Gindex const y, Gindex const xx, Gindex const yy, GimgValue const color, Gb const isEven);
+#endif
+static void  _SetCirclePixels(         Gimg       * const img, Gindex const x, Gindex const y, Gindex const xx, Gindex const yy, GimgValue const color, Gb const isEven);
+static void  _SetCirclePixelsEven(     Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, Gindex const index, Gindex const step, GimgValue const color);
+static void  _SetCirclePixelsOdd(      Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, Gindex const index, Gindex const step, GimgValue const color);
+static void  _SetCirclePixelsOddFirst( Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width,                                        GimgValue const color);
 
 /**************************************************************************************************
 global:
@@ -355,6 +411,7 @@ GIMG_API Gb gimgGetValue(Gimg const * const img, Gindex const x, Gindex const y,
 
    greturnFalseIf(
       !img                       ||
+      !value                     ||
       x < 0  || img->width  <= x ||
       y < 0  || img->height <= y);
 
@@ -367,7 +424,7 @@ GIMG_API Gb gimgGetValue(Gimg const * const img, Gindex const x, Gindex const y,
 /**************************************************************************************************
 func: gimgGetGammaTable
 **************************************************************************************************/
-Gr4 *gimgGetGammaTable(void)
+Gr *gimgGetGammaTable(void)
 {
    genter;
 
@@ -391,7 +448,7 @@ GIMG_API Gcount gimgGetHeight(Gimg const * const img)
 /**************************************************************************************************
 func: gimgGetPercentTable
 **************************************************************************************************/
-Gr4 *gimgGetPercentTable(void)
+Gr *gimgGetPercentTable(void)
 {
    genter;
 
@@ -488,7 +545,7 @@ GIMG_API Gimg *gimgLoad(Gpath const * const filePath)
                pixel,
                buffer,
                &r, &g, &b, &a);
-            gimgValueSET_RGBA_N1(
+            gimgValueSET_RN1_GN1_BN1_AN1(
                color,
                N4ToN1(r),
                N4ToN1(g),
@@ -514,165 +571,402 @@ GIMG_API Gimg *gimgLoad(Gpath const * const filePath)
 #endif
 
 /**************************************************************************************************
-func: gimgResizeFixed
+func: gimgResizeFixed_N1
 
 Resizes an image that is an exact multiple of another image.
 **************************************************************************************************/
-GIMG_API Gb gimgResizeFixed(Gimg const * const simage, Gimg * const dimage)
+GIMG_API Gb gimgResizeFixed_N1(Gimg const * const simage, Gimg * const dimage)
 {
-   returnFalseIf(
-      !simage ||
-      !dimage ||
-      simage->valueType != dimage->valueType);
-
-   switch (simage->valueType)
-   {
-   case gimgTypeKN1:
-   case gimgTypeKN2:
-   case gimgTypeKN4:
-   case gimgTypeKN8:
-   case gimgTypeKR4:
-   case gimgTypeKR8:
-      greturn _ResizeFixedK(simage, dimage);
-
-   case gimgTypeKN1_AN1:
-   case gimgTypeKN2_AN2:
-   case gimgTypeKN4_AN4:
-   case gimgTypeKN8_AN8:
-   case gimgTypeKR4_AR4:
-   case gimgTypeKR8_AR8:
-      greturn _ResizeFixedKA(simage, dimage);
-
-   case gimgTypeRN1_GN1_BN1:
-   case gimgTypeRN2_GN2_BN2:
-   case gimgTypeRN4_GN4_BN4:
-   case gimgTypeRN8_GN8_BN8:
-   case gimgTypeRR4_GR4_BR4:
-   case gimgTypeRR8_GR8_BR8:
-      greturn _ResizeFixedRGB(simage, dimage);
-
-   case gimgTypeRN1_GN1_BN1_AN1:
-   case gimgTypeRN2_GN2_BN2_AN2:
-   case gimgTypeRN4_GN4_BN4_AN4:
-   case gimgTypeRN8_GN8_BN8_AN8:
-   case gimgTypeRR4_GR4_BR4_AR4:
-   case gimgTypeRR8_GR8_BR8_AR8:
-      greturn _ResizeFixedRGB(simage, dimage);
-   }
-
-   greturn gbFALSE;
-}
-
-/**************************************************************************************************
-func: gimgSetCircle
-**************************************************************************************************/
-GIMG_API Gb gimgSetCircle(Gimg * const img, Gindex const inx, Gindex const iny, Gcount const w,
-   GimgValue const color)
-{
-   Gindex x,
-          y,
-          xx,
-          yy,
-          d,
-          de,
-          dse;
+   Gn1         r, g, b, a;
+   GimgValue   p;
+   Gindex      dx,  dy,
+               sx,  sy,
+               sampleX, sampleY;
+   Gcount      sampleCount,
+               dw,  dh,
+               sw,  sh,
+               unsampleCount;
+   Gn4         sumr, sumg, sumb, suma;
 
    genter;
 
-   x = inx + (w - 1) / 2;
-   y = iny + (w - 1) / 2;
+   greturnFalseIf(
+      !simage ||
+      !dimage ||
+      !(simage->valueType & gimgTypeN1 &&
+        dimage->valueType & gimgTypeN1));
 
-   xx = 0;
-   yy = (w - 1) / 2;
+   sw = simage->width;
+   sh = simage->height;
+   dw = dimage->width;
+   dh = dimage->height;
 
-   d   =  1 - yy;
-   de  =  3;
-   dse = -2 * yy + 5;
+   sampleX     = sw / dw;
+   sampleY     = sh / dh;
+   sampleCount = sampleX * sampleY;
 
-   for (xx = 0; xx < yy; xx++)
+   forCount(dy, dh)
    {
-      if (d < 0)
+      forCount(dx, dw)
       {
-         d   += de;
-         de  += 2;
-         dse += 2;
-      }
-      else
-      {
-         d   += dse;
-         de  += 2;
-         dse += 4;
-         yy--;
-      }
+         unsampleCount = 0;
+         sumr          =
+            sumg       =
+            sumb       =
+            suma       = 0;
 
-      _SetCirclePixels(img, x, y, xx, yy, color, !(w & 1));
+         forCount(sy, sampleY)
+         {
+            forCount(sx, sampleX)
+            {
+               GET_PIXEL_VALUE(simage, dx, dy, &p);
+               VALUE_TO_RGBA_N1(simage->valueType, p);
+               gimgValueGET_RN1_GN1_BN1_AN1(r, g, b, a, p);
+
+               if (a == 0)
+               {
+                  unsampleCount++;
+               }
+               else
+               {
+                  sumr += r;
+                  sumg += g;
+                  sumb += b;
+               }
+               suma += a;
+            }
+         }
+
+         // Average the samples.
+         if (unsampleCount == sampleCount)
+         {
+            sumr = 0;
+            sumg = 0;
+            sumb = 0;
+            suma = 0;
+         }
+         else
+         {
+            sumr /= (sampleCount - unsampleCount);
+            sumg /= (sampleCount - unsampleCount);
+            sumb /= (sampleCount - unsampleCount);
+            suma /= sampleCount;
+         }
+
+         gimgValueSET_RN1_GN1_BN1_AN1(p, sumr, sumg, sumb, suma);
+         VALUE_FROM_RGBA_N1(dimage->valueType, p);
+         SET_PIXEL_VALUE(dimage, dx, dy, p);
+      }
    }
 
    greturn gbTRUE;
 }
 
+/**************************************************************************************************
+func: gimgSetCircle
+
+Why am I not using a midpoint integer base scan conversion circle routine?  I did have this
+implemented using a Bresenham algoritm but it didn't quite do what I wanted on the even or odd case
+so I did this for now to get a result that I am looking for.  Will speed this up later with an
+integer bases solution.
+**************************************************************************************************/
+GIMG_API Gb gimgSetCircle(Gimg * const img, Gindex const inx, Gindex const iny, Gcount const w,
+   GimgValue const color)
+{
+   Gindex offset,
+          radius,
+          index,
+          step;
+   Gr4    xr,
+          xrsq,
+          y1,
+          y1sq,
+          y2,
+          y2sq,
+          d1,
+          d2,
+          rsq;
+
+   genter;
+
+   greturnFalseIf(w <= 0);
+
+   greturnIf(w == 1, gimgSetValue(img, inx, iny, color));
+
+   // Dealing with an odd width.  Symetric around a central pixel.
+   //     +---------------+ w (3, 5, 7, ...)
+   //             +-------+ radius
+   //     +-------+         offset
+   //     x
+   //   +---+---+---+---+---+
+   // y |   |   |   |   |   | + y1 = radius
+   //   +---+---+---+---+---+ |
+   //   |   |   |   |   |   | | y2 = radius - 1
+   //   +---+---+---+---+---+ | |
+   //   |   |   | o |   |   | + +
+   //   +---+---+---+---+---+
+   //   |   |   |   |   |   |
+   //   +---+---+---+---+---+
+   //   |   |   |   |   |   |
+   //   +---+---+---+---+---+
+   //             xr->
+   //
+   // o = center of circle
+   if (w % 2)
+   {
+      offset    =
+         radius = (w - 1) / 2;
+
+      rsq = (Gr4) (radius * radius);
+      xr  = 0;
+      y1  = (Gr4)  radius;
+      y2  = (Gr4) (radius - 1);
+
+      // First iteration is 4 symetry.
+      _SetCirclePixelsOddFirst(img, inx, iny, offset, w, color);
+
+      step = 0;
+      for (index = 1; index < offset; index++)
+      {
+         xr = (Gr4) index;
+         y1 = (Gr4)  radius - step;
+         y2 = (Gr4) (radius - step - 1);
+
+         xrsq = xr * xr;
+         breakIf(xrsq + 0.5 >= rsq);
+
+         y1sq = y1 * y1;
+         y2sq = y2 * y2;
+
+         d1 = (xrsq + y1sq) - rsq;
+         d2 = rsq - (xrsq + y2sq);
+
+         // sqrt(x^2 + y^2) = h
+         //      x^2 + y^2  = h^2
+         // x starts off as being 0 and increments.
+         // y starts off being the radius.
+         // d1 is the diff of the radius^2 with using the x^2 + y^2 assuming y doesn't change from iteration
+         // d2 is the diff ... assuming y decreases by 1 from last interation.
+         // If d2 is closer to 0, closer to the radius, then we need to step y down.
+         if (d2 < d1)
+         {
+            step++;
+         }
+         _SetCirclePixelsOdd(img, inx, iny, offset, w, index, step, color);
+      }
+   }
+   // Dealing with an even width.  Symetric around a pixel boundary.
+   //      +-----------+ w = even (2, 4, 6, ...)
+   //            +---+   radius (+ 0.5f)
+   //      +-------+     offset
+   //      x
+   //    +---+---+---+---+
+   //  y |   |   |   |   | + y1 = radius (+ 0.5f)
+   //    +---+---+---+---+ |
+   //    |   |   |   |   | | + y2 = radius - 1 (+ 0.5f)
+   //    +---+---o---+---+ + +
+   //    |   |   |   |   |
+   //    +---+---+---+---+
+   //    |   |   |   |   |
+   //    +---+---+---+---+
+   //            xr->
+   else
+   {
+      offset    =  w      / 2;
+         radius = (w - 1) / 2;
+
+      rsq = (Gr4) (radius + 0.5f) * (radius + 0.5f);
+      xr  = 0.5f;
+      y1  = (Gr4) radius + 0.5f;
+      y2  = (Gr4) radius - 0.5f;
+
+      _SetCirclePixelsEven(img, inx, iny, offset, w, 0, 0, color);
+
+      step = 0;
+      for (index = 1; index < offset; index++)
+      {
+         xr = (Gr4) index + 0.5f;
+         y1 = (Gr4) (radius - step) + 0.5f;
+         y2 = (Gr4) (radius - step) - 0.5f;
+
+          xrsq = xr * xr;
+         breakIf(xrsq + 0.5 >= rsq);
+
+         y1sq = y1 * y1;
+         y2sq = y2 * y2;
+
+         d1 = (xrsq + y1sq) - rsq;
+         d2 = rsq - (xrsq + y2sq);
+
+         // sqrt(x^2 + y^2) = h
+         //      x^2 + y^2  = h^2
+         // x starts off as being 0 and increments.
+         // y starts off being the radius.
+         // d1 is the diff of the radius^2 with using the x^2 + y^2 assuming y doesn't change from iteration
+         // d2 is the diff ... assuming y decreases by 1 from last interation.
+         // If d2 is closer to 0, closer to the radius, then we need to step y down.
+         if (d2 < d1)
+         {
+            step++;
+         }
+         _SetCirclePixelsEven(img, inx, iny, offset, w, index, step, color);
+      }
+   }
+
+   greturn gbTRUE;
+}
+
+#if 0
 /**************************************************************************************************
 func: gimgSetCircleFill
 **************************************************************************************************/
 GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const iny, Gcount const w,
    GimgValue const color)
 {
-   Gindex x,
-          y,
-          xx,
-          yy,
-          d,
-          de,
-          dse;
+   Gindex offset,
+          radius,
+          index,
+          step;
+   Gr4    xr,
+          xrsq,
+          y1,
+          y1sq,
+          y2,
+          y2sq,
+          d1,
+          d2,
+          rsq;
 
    genter;
 
-   x = inx + (w - 1) / 2;
-   y = iny + (w - 1) / 2;
+   greturnFalseIf(w <= 0);
 
-   xx = 0;
-   yy = (w - 1) / 2;
+   greturnIf(w == 1, gimgSetValue( img, inx, iny,    color));
+   greturnIf(w == 2, gimgSetCircle(img, inx, iny, w, color));
 
-   d   =  1 - yy;
-   de  =  3;
-   dse = -2 * yy + 5;
-
-   for (xx = 0; xx < yy; xx++)
+   // Dealing with an odd width.  Symetric around a central pixel.
+   //     +---------------+ w (3, 5, 7, ...)
+   //             +-------+ radius
+   //     +-------+         offset
+   //     x
+   //   +---+---+---+---+---+
+   // y |   |   |   |   |   | + y1 = radius
+   //   +---+---+---+---+---+ |
+   //   |   |   |   |   |   | | y2 = radius - 1
+   //   +---+---+---+---+---+ | |
+   //   |   |   | o |   |   | + +
+   //   +---+---+---+---+---+
+   //   |   |   |   |   |   |
+   //   +---+---+---+---+---+
+   //   |   |   |   |   |   |
+   //   +---+---+---+---+---+
+   //             xr->
+   //
+   // o = center of circle
+   if (w % 2)
    {
-      if (d < 0)
-      {
-         d   += de;
-         de  += 2;
-         dse += 2;
-      }
-      else
-      {
-         d   += dse;
-         de  += 2;
-         dse += 4;
-         yy--;
-      }
+      offset    =
+         radius = (w - 1) / 2;
 
-      _SetCircleLines(img, x, y, xx, yy, color, !(w & 1));
+      rsq = (Gr4) (radius * radius);
+      xr  = 0;
+      y1  = (Gr4)  radius;
+      y2  = (Gr4) (radius - 1);
+
+      // First iteration is 4 symetry.
+      _SetCirclePixelsOddFirst(img, inx, iny, offset, w, color);
+
+      step = 0;
+      for (index = 1; index < offset; index++)
+      {
+         xr = (Gr4) index;
+         y1 = (Gr4)  radius - step;
+         y2 = (Gr4) (radius - step - 1);
+
+         xrsq = xr * xr;
+         breakIf(xrsq + 0.5 >= rsq);
+
+         y1sq = y1 * y1;
+         y2sq = y2 * y2;
+
+         d1 = (xrsq + y1sq) - rsq;
+         d2 = rsq - (xrsq + y2sq);
+
+         // sqrt(x^2 + y^2) = h
+         //      x^2 + y^2  = h^2
+         // x starts off as being 0 and increments.
+         // y starts off being the radius.
+         // d1 is the diff of the radius^2 with using the x^2 + y^2 assuming y doesn't change from iteration
+         // d2 is the diff ... assuming y decreases by 1 from last interation.
+         // If d2 is closer to 0, closer to the radius, then we need to step y down.
+         if (d2 < d1)
+         {
+            step++;
+         }
+         _SetCirclePixelsOdd(img, inx, iny, offset, w, index, step, color);
+      }
+   }
+   // Dealing with an even width.  Symetric around a pixel boundary.
+   //      +-----------+ w = even (2, 4, 6, ...)
+   //            +---+   radius (+ 0.5f)
+   //      +-------+     offset
+   //      x
+   //    +---+---+---+---+
+   //  y |   |   |   |   | + y1 = radius (+ 0.5f)
+   //    +---+---+---+---+ |
+   //    |   |   |   |   | | + y2 = radius - 1 (+ 0.5f)
+   //    +---+---o---+---+ + +
+   //    |   |   |   |   |
+   //    +---+---+---+---+
+   //    |   |   |   |   |
+   //    +---+---+---+---+
+   //            xr->
+   else
+   {
+      offset    =  w      / 2;
+         radius = (w - 1) / 2;
+
+      rsq = (Gr4) (radius + 0.5f) * (radius + 0.5f);
+      xr  = 0.5f;
+      y1  = (Gr4) radius + 0.5f;
+      y2  = (Gr4) radius - 0.5f;
+
+      _SetCirclePixelsEven(img, inx, iny, offset, w, 0, 0, color);
+
+      step = 0;
+      for (index = 1; index < offset; index++)
+      {
+         xr = (Gr4) index + 0.5f;
+         y1 = (Gr4) (radius - step) + 0.5f;
+         y2 = (Gr4) (radius - step) - 0.5f;
+
+          xrsq = xr * xr;
+         breakIf(xrsq + 0.5 >= rsq);
+
+         y1sq = y1 * y1;
+         y2sq = y2 * y2;
+
+         d1 = (xrsq + y1sq) - rsq;
+         d2 = rsq - (xrsq + y2sq);
+
+         // sqrt(x^2 + y^2) = h
+         //      x^2 + y^2  = h^2
+         // x starts off as being 0 and increments.
+         // y starts off being the radius.
+         // d1 is the diff of the radius^2 with using the x^2 + y^2 assuming y doesn't change from iteration
+         // d2 is the diff ... assuming y decreases by 1 from last interation.
+         // If d2 is closer to 0, closer to the radius, then we need to step y down.
+         if (d2 < d1)
+         {
+            step++;
+         }
+         _SetCirclePixelsEven(img, inx, iny, offset, w, index, step, color);
+      }
    }
 
    greturn gbTRUE;
 }
-
-/**************************************************************************************************
-func: gimgSetValue
-**************************************************************************************************/
-GIMG_API Gb gimgSetValue(Gimg * const img, Gindex const x, Gindex const y, GimgValue const value)
-{
-   greturnFalseIf(
-      !img                       ||
-      x < 0  || img->width  <= x ||
-      y < 0  || img->height <= y);
-
-   SET_PIXEL_VALUE(img, y, x, value);
-
-   greturn gbTRUE;
-}
+#endif
 
 /**************************************************************************************************
 func: gimgSetClear
@@ -702,10 +996,14 @@ GIMG_API Gb gimgSetClear(Gimg * const img, GimgValue const color)
    greturn gbTRUE;
 }
 
+#if 0
 /**************************************************************************************************
-func: gimgSetImage
+func: gimgSetImage_N1
+
+Copy the new image over an old image.  This doesn't merge images or do any alpha blending.  Both
+images need to be of the same type.  Works with any image type.
 **************************************************************************************************/
-GIMG_API Gb gimgSetImage(Gimg * const img, Gindex const x, Gindex const y, Gimg const * const value)
+GIMG_API Gb gimgSetImage_N1(Gimg * const img, Gindex const x, Gindex const y, Gimg const * const value)
 {
    Gindex     ix,
               iy,
@@ -724,11 +1022,8 @@ GIMG_API Gb gimgSetImage(Gimg * const img, Gindex const x, Gindex const y, Gimg 
    greturnFalseIf(
       !img                                         ||
       !value                                       ||
-      img->valueType != value->valueType           ||
-      !(img->valueType == gimgTypeKN1           ||
-        img->valueType == gimgTypeKN1_AN1       ||
-        img->valueType == gimgTypeRN1_GN1_BN1   ||
-        img->valueType == gimgTypeRN1_GN1_BN1_AN1) ||
+      !(img->valueType   & gimgTypeN1 &&
+        value->valueType & gimgTypeN1)             ||
       x + value->width  < 0 || img->width  - 1 < x ||
       y + value->height < 0 || img->height - 1 < y);
 
@@ -778,11 +1073,13 @@ GIMG_API Gb gimgSetImage(Gimg * const img, Gindex const x, Gindex const y, Gimg 
    greturn gbTRUE;
 }
 
-#if 0
 /**************************************************************************************************
-func: gimgSetImageAlpha
+func: gimgSetImageA
+
+Treat the destination image as an opaque image.  The source image is an alpah image.  Only works
+with RN1_GN1_BN1_AN1 images.
 **************************************************************************************************/
-GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
+GIMG_API Gb gimgSetImageA(Gimg * const img, Gindex const x, Gindex const y,
    Gimg const * const value)
 {
    Gindex     ix, iy,
@@ -790,13 +1087,16 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
               iindex, vindex;
    Gcount     iw, ih,
               vw, vh,
-              valueByteCount;
+              valueByteCount,
+              irowByteCount,
+              vrowByteCount;
    Gn1        vr, vg, vb, va,
               ir, ig, ib, ia;
    Gn1       *iValueData,
              *vValueData;
    Gr4        vpercent,
               ipartPercent;
+   GimgValue  color;
 
    genter;
 
@@ -804,11 +1104,12 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
       !img                                         ||
       !value                                       ||
       img->valueType != value->valueType           ||
-      !(img->valueType == gimgTypeKN1_AN1       ||
-        img->valueType == gimgTypeRN1_GN1_BN1_AN1) ||
+      !(img->valueType == gimgTypeRN1_GN1_BN1_AN1) ||
       x + value->width  < 0 || img->width  - 1 < x ||
       y + value->height < 0 || img->height - 1 < y);
 
+   irowByteCount  = img->rowByteCount;
+   vrowByteCount  = value->rowByteCount;
    valueByteCount = img->valueByteCount;
    iValueData     = img->valueData;
    vValueData     = value->valueData;
@@ -845,61 +1146,55 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
    {
       for (iindex = ix, vindex = vx; iindex < iw; iindex++, vindex++)
       {
-         gimgValueGET_RGBA_N1(
-            vr,
-            vg,
-            vb,
-            va,
-            vbuffer[vy * value->width + vindex]);
+         GET_VALUE(
+            color,
+            valueByteCount,
+            vValueData + vy * vrowByteCount + vindex * valueByteCount);
+
+         gimgValueGET_RN1_GN1_BN1_AN1(vr, vg, vb, va, color);
+
          continueIf(va == 0);
 
          if (va == 255)
          {
-            gimgValueSET_RGBA_N1(
-               ibuffer[iy * img->width + iindex],
-               (Gn1) vr,
-               (Gn1) vg,
-               (Gn1) vb,
-               (Gn1) va);
+            SET_VALUE(
+               iValueData + iy * irowByteCount + iindex * valueByteCount,
+               valueByteCount,
+               color);
             continue;
          }
 
-         gimgValueGET_RGBA_N1(
-            ir,
-            ig,
-            ib,
-            ia,
-            ibuffer[iy * img->width + iindex]);
+         GET_VALUE(color, valueByteCount, iValueData + iy * irowByteCount + iindex * valueByteCount);
+         gimgValueGET_RN1_GN1_BN1_AN1(ir, ig, ib, ia, color);
 
-         // Merge the colors
+         // Merge pixels
          vpercent     = ((Gr4) va) / (255.0f);
          ipartPercent = 1.0f - vpercent;
 
-         ir = (Gn1) (ipartPercent * ((Gr4) ir) + vpercent * ((Gr4) vr));
-         ig = (Gn1) (ipartPercent * ((Gr4) ig) + vpercent * ((Gr4) vg));
-         ib = (Gn1) (ipartPercent * ((Gr4) ib) + vpercent * ((Gr4) vb));
 
-         gimgValueSET_RGBA_N1(
-            ibuffer[iy * img->width + iindex],
-            (Gn1) ir,
-            (Gn1) ig,
-            (Gn1) ib,
+         gimgValueSET_RN1_GN1_BN1_AN1(
+            color,
+            (Gn1) (ipartPercent * ((Gr4) ir) + vpercent * ((Gr4) vr)),
+            (Gn1) (ipartPercent * ((Gr4) ig) + vpercent * ((Gr4) vg)),
+            (Gn1) (ipartPercent * ((Gr4) ib) + vpercent * ((Gr4) vb)),
             (Gn1) ia);
+
+         SET_VALUE(
+            iValueData + iy * irowByteCount + iindex * valueByteCount,
+            valueByteCount,
+            color);
       }
    }
 
    greturn gbTRUE;
-   greturn gbFALSE;
 }
-#endif
 
 /**************************************************************************************************
-func: gimgSetImageAlpha
+func: gimgSetImageAA
 
-Destination is an alphaed image.  Source image is an alphaed image.  Final
-image will still be an alphaed image.
+Both Destination and Source image are alpha images.  Final image will still be an alpha image.
 **************************************************************************************************/
-GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
+GIMG_API Gb gimgSetImageAA(Gimg * const img, Gindex const x, Gindex const y,
    Gimg const * const value)
 {
    Gindex     ix, iy,
@@ -973,7 +1268,7 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
             valueByteCount,
             vValueData + vy * vrowByteCount + vindex * valueByteCount);
 
-         gimgValueGET_RGBA_N1(vr, vg, vb, va, color);
+         gimgValueGET_RN1_GN1_BN1_AN1(vr, vg, vb, va, color);
 
          continueIf(va == 0);
 
@@ -989,14 +1284,15 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
 
          // Calculate the new pixel color by merging the two colors.
          GET_VALUE(color, valueByteCount, iValueData + iy * irowByteCount + iindex * valueByteCount);
-         gimgValueGET_RGBA_N1(ir, ig, ib, ia, color);
+         gimgValueGET_RN1_GN1_BN1_AN1(ir, ig, ib, ia, color);
 
+         // Merge pixels.
          vpercent     = ((Gr4) va) / (255.0f);
          ipercent     = ((Gr4) ia) / (255.0f);
          ipartPercent = (1.0f - vpercent) * ipercent;
          percent      = ipartPercent + vpercent;
 
-         gimgValueSET_RGBA_N1(
+         gimgValueSET_RN1_GN1_BN1_AN1(
             color,
             (Gn1) ((ipartPercent * ((Gr4) ir) + vpercent * ((Gr4) vr)) / percent),
             (Gn1) ((ipartPercent * ((Gr4) ig) + vpercent * ((Gr4) vg)) / percent),
@@ -1007,118 +1303,6 @@ GIMG_API Gb gimgSetImageAlpha(Gimg * const img, Gindex const x, Gindex const y,
             iValueData + iy * irowByteCount + iindex * valueByteCount,
             valueByteCount,
             color);
-      }
-   }
-
-   greturn gbTRUE;
-}
-
-#if 0
-/**************************************************************************************************
-func: gimgAlphaSetImageAlphaSub
-
-Destination is an alphaed image.  Source image is an alphaed image.  Final
-image will still be an alphaed image.
-
-Source image is just removing, making transparent, parts of the destination
-image.
-**************************************************************************************************/
-GIMG_API Gb gimgAlphaSetImageAlphaSub(Gimg * const img, Gindex const x,
-   Gindex const y, Gimg const * const value)
-{
-   Gindex     ix, iy,
-              vx, vy,
-              iindex, vindex;
-   Gcount     iw, ih,
-              vw, vh;
-   Gn1        vr, vg, vb, va,
-              ir, ig, ib, ia;
-   GimgValue *ibuffer,
-             *vbuffer;
-   Gr4        vpercent,
-              ipercent;
-
-   genter;
-
-   greturnFalseIf(
-      !img                  ||
-      !value                ||
-      x + value->width  < 0 || img->width  - 1 < x ||
-      y + value->height < 0 || img->height - 1 < y);
-
-   ibuffer = gimgGetBuffer(img);
-   vbuffer = gimgGetBuffer(value);
-
-   vx = 0;
-   vy = 0;
-   vw = value->width;
-   vh = value->height;
-
-   // Clip off the under flow
-   ix = x;
-   if (ix < 0)
-   {
-      ix  = 0;
-      vx  = -x;
-      vw -= -x;
-   }
-   iy = y;
-   if (iy < 0)
-   {
-      iy  = 0;
-      vy  = -y;
-      vh -= -y;
-   }
-
-   // Clip off the over flow
-   vw = gMIN(img->width  - ix, vw);
-   vh = gMIN(img->height - iy, vh);
-   iw = ix + vw;
-   ih = iy + vh;
-
-   // Copy the image information.
-   for (; iy < ih; iy++, vy++)
-   {
-      for (iindex = ix, vindex = vx; iindex < iw; iindex++, vindex++)
-      {
-         gimgValueGET_RGBA_N1(
-            vr,
-            vg,
-            vb,
-            va,
-            vbuffer[vy * value->width + vindex]);
-         continueIf(va == 0);
-
-         if (va == 255)
-         {
-            gimgValueSET_RGBA_N1(
-               ibuffer[iy * img->width + iindex],
-               (Gn1) vr,
-               (Gn1) vg,
-               (Gn1) vb,
-               (Gn1) va);
-            continue;
-         }
-
-         gimgValueGET_RGBA_N1(
-            ir,
-            ig,
-            ib,
-            ia,
-            ibuffer[iy * img->width + iindex]);
-
-         // Adjust the alpha
-         vpercent  = 1.0f     - (((Gr4) va) / (255.0f));
-         ipercent  = vpercent * (((Gr4) ia) / (255.0f));
-
-         ia = (Gn1) (255.0f * ipercent);
-
-         gimgValueSET_RGBA_N1(
-            ibuffer[iy * img->width + iindex],
-            (Gn1) ir,
-            (Gn1) ig,
-            (Gn1) ib,
-            (Gn1) ia);
       }
    }
 
@@ -1168,13 +1352,13 @@ GIMG_API Gb gimgSetLine(Gimg * const img, Gindex const ix1, Gindex const iy1, Gi
 /**************************************************************************************************
 func: gimgSetLineH
 **************************************************************************************************/
-GIMG_API Gb gimgSetLineH(Gimg * const img, Gindex const x, Gindex const y, Gcount const w,
+GIMG_API Gb gimgSetLineH(Gimg * const img, Gindex const x, Gindex const y, Gcount const inw,
    GimgValue const p)
 {
-   GimgValue *buffer;
-   Gindex     a,
-              index;
-   Gcount     nw;
+   Gn1   *buffer;
+   Gindex a,
+          index;
+   Gcount nw;
 
    genter;
 
@@ -1184,40 +1368,41 @@ GIMG_API Gb gimgSetLineH(Gimg * const img, Gindex const x, Gindex const y, Gcoun
 
    // Clip.
    index = x;
-   nw    = w;
+   nw    = inw;
    if (index < 0)
    {
-      nw     = nw + index;
+      nw    = nw + index;
       index = 0;
    }
 
    // Find the start pixel.
-   buffer = img->valueData + y * img->width + index;
+   buffer = img->valueData + y * img->rowByteCount + index * img->valueByteCount;
    a      = index + gMIN(img->width - index, nw);
 
    for (; index < a; index++)
    {
       // Set the pixel
-      *buffer = p;
-      buffer++;
+      SET_VALUE(buffer, img->valueByteCount, p);
+      buffer += img->valueByteCount;
    }
 
    greturn gbTRUE;
 }
 
+#if 0
 /**************************************************************************************************
 func: gimgSetLineHAlpha
 **************************************************************************************************/
 GIMG_API Gb gimgSetLineHAlpha(Gimg * const img, Gindex const x, Gindex const y, Gcount const inw,
    GimgValue const color)
 {
-   GimgValue *buffer;
-   Gindex     a,
-              index;
-   Gcount     w;
-   Gn1        cr,  cg,  cb,  ca,
-              sr,  sg,  sb,  sa;
-   Gi4        cir, cig, cib, cia;
+   Gn1   *buffer;
+   Gindex a,
+          index;
+   Gcount w;
+   Gn1    cr,  cg,  cb,  ca,
+          sr,  sg,  sb,  sa;
+   Gi4    cir, cig, cib, cia;
 
    genter;
 
@@ -1239,7 +1424,7 @@ GIMG_API Gb gimgSetLineHAlpha(Gimg * const img, Gindex const x, Gindex const y, 
    a      = index + gMIN(img->width - index, w);
 
    // color to alpha in.
-   gimgValueGET_RGBA_N1(cr, cg, cb, ca, color);
+   gimgValueGET_RN1_GN1_BN1_AN1(cr, cg, cb, ca, color);
    cir = cr * ca;
    cig = cg * ca;
    cib = cb * ca;
@@ -1247,7 +1432,7 @@ GIMG_API Gb gimgSetLineHAlpha(Gimg * const img, Gindex const x, Gindex const y, 
    for (; index < a; index++)
    {
       // Get the existing pixel
-      gimgValueGET_RGBA_N1(sr, sg, sb, sa, *buffer);
+      gimgValueGET_RN1_GN1_BN1_AN1(sr, sg, sb, sa, *((GimgValue *) buffer));
 
       // Merge the colors
       sr = (Gn1) ((((Gi4) sr) * cia + cir) >> 8);
@@ -1255,7 +1440,7 @@ GIMG_API Gb gimgSetLineHAlpha(Gimg * const img, Gindex const x, Gindex const y, 
       sb = (Gn1) ((((Gi4) sb) * cia + cib) >> 8);
 
       // Set the pixel
-      gimgValueSET_RGBA_N1(*buffer, sr, sg, sb, sa);
+      gimgValueSET_RN1_GN1_BN1_AN1(*((GimgValue *) buffer), sr, sg, sb, sa);
 
       buffer += img->valueByteCount;
    }
@@ -1269,18 +1454,17 @@ func: gimgSetLineHInterpolate
 GIMG_API Gb gimgSetLineHInterpolate(Gimg * const img, Gindex const x, Gindex const y,
    Gcount const inw, GimgValue const pa, GimgValue const pb)
 {
-   GimgValue    *buffer,
-                 p;
-   Gindex        a,
-                 index;
-   Gcount        w;
-   Gn1           ra, rb,
-                 ga, gb,
-                 ba, bb,
-                 aa, ab;
-   GinterpI      ir,
-                 ig,
-                 ib;
+   Gn1      *buffer;
+   Gindex    a,
+             index;
+   Gcount    w;
+   Gn1       ra, rb,
+             ga, gb,
+             ba, bb,
+             aa, ab;
+   GinterpI  ir,
+             ig,
+             ib;
 
    genter;
 
@@ -1291,8 +1475,8 @@ GIMG_API Gb gimgSetLineHInterpolate(Gimg * const img, Gindex const x, Gindex con
    w = inw;
 
    // Get the color components of the input.
-   gimgValueGET_RGBA_N1(ra, ga, ba, aa, pa);
-   gimgValueGET_RGBA_N1(rb, gb, bb, ab, pb);
+   gimgValueGET_RN1_GN1_BN1_AN1(ra, ga, ba, aa, pa);
+   gimgValueGET_RN1_GN1_BN1_AN1(rb, gb, bb, ab, pb);
 
    // Set up the interpolators.
    ginterpISet(&ir, 0, (Gi4) ra, w, (Gi4) rb);
@@ -1317,16 +1501,15 @@ GIMG_API Gb gimgSetLineHInterpolate(Gimg * const img, Gindex const x, Gindex con
    for (; index < a; index++)
    {
       // Get the current color.
-      gimgValueSET_RGBA_N1(
-         p,
+      gimgValueSET_RN1_GN1_BN1_AN1(
+         *((GimgValue *) buffer),
          (Gn1) ginterpIGetY1(&ir),
          (Gn1) ginterpIGetY1(&ig),
          (Gn1) ginterpIGetY1(&ib),
          aa);
 
       // Set the pixel
-      *buffer = p;
-      buffer++;
+      buffer += img->valueByteCount;
 
       // Interpolate the color step.
       ginterpIGetNext(&ir);
@@ -1336,6 +1519,7 @@ GIMG_API Gb gimgSetLineHInterpolate(Gimg * const img, Gindex const x, Gindex con
 
    greturn gbTRUE;
 }
+#endif
 
 /**************************************************************************************************
 func: gimgSetLineV
@@ -1343,11 +1527,10 @@ func: gimgSetLineV
 GIMG_API Gb gimgSetLineV(Gimg * const img, Gindex const x, Gindex const y, Gcount const inh,
    GimgValue const p)
 {
-   GimgValue *buffer;
-   Gindex     a,
-              index;
-   Goffset    rowOffset;
-   Gcount     h;
+   Gn1   *buffer;
+   Gindex a,
+          index;
+   Gcount nh;
 
    genter;
 
@@ -1357,41 +1540,40 @@ GIMG_API Gb gimgSetLineV(Gimg * const img, Gindex const x, Gindex const y, Gcoun
 
    // Clip.
    index = y;
-   h     = inh;
+   nh    = inh;
    if (index < 0)
    {
-      h     = h + index;
+      nh    = nh + index;
       index = 0;
    }
 
    // Set the buffer pointer.
-   buffer    = img->valueData + index * img->rowByteCount + x * img->valueByteCount;
-   a         = index + gMIN(img->height - index, h);
-   rowOffset = img->width;
+   buffer = img->valueData + index * img->rowByteCount + x * img->valueByteCount;
+   a      = index + gMIN(img->height - index, nh);
 
    for (; index < a; index++)
    {
-      *buffer = p;
-      buffer  = buffer + rowOffset;
+      SET_VALUE(buffer, img->valueByteCount, p);
+      buffer += img->rowByteCount;
    }
 
    greturn gbTRUE;
 }
 
+#if 0
 /**************************************************************************************************
 func: gimgSetLineVAlpha
 **************************************************************************************************/
 GIMG_API Gb gimgSetLineVAlpha(Gimg * const img, Gindex const x, Gindex const y, Gcount const inh,
    GimgValue const color)
 {
-   GimgValue *buffer;
-   Gindex     a,
-              index;
-   Goffset    rowOffset;
-   Gcount     h;
-   Gn1        cr,  cg,  cb,  ca,
-              sr,  sg,  sb,  sa;
-   Gi4        cir, cig, cib, cia;
+   Gn1   *buffer;
+   Gindex a,
+          index;
+   Gcount h;
+   Gn1    cr,  cg,  cb,  ca,
+          sr,  sg,  sb,  sa;
+   Gi4    cir, cig, cib, cia;
 
    genter;
 
@@ -1411,10 +1593,9 @@ GIMG_API Gb gimgSetLineVAlpha(Gimg * const img, Gindex const x, Gindex const y, 
    // Set the buffer pointer.
    buffer    = img->valueData + index * img->rowByteCount + x * img->valueByteCount;
    a         = index + gMIN(img->height - index, h);
-   rowOffset = img->width;
 
    // color to alpha in.
-   gimgValueGET_RGBA_N1(cr, cg, cb, ca, color);
+   gimgValueGET_RN1_GN1_BN1_AN1(cr, cg, cb, ca, color);
    cir = cr * ca;
    cig = cg * ca;
    cib = cb * ca;
@@ -1422,7 +1603,7 @@ GIMG_API Gb gimgSetLineVAlpha(Gimg * const img, Gindex const x, Gindex const y, 
    for (; index < a; index++)
    {
       // Get the existing pixel
-      gimgValueGET_RGBA_N1(sr, sg, sb, sa, *buffer);
+      gimgValueGET_RN1_GN1_BN1_AN1(sr, sg, sb, sa, *((GimgValue *) buffer));
 
       // Merge the colors
       sr = (Gn1) ((((Gi4) sr) * cia + cir) >> 8);
@@ -1430,8 +1611,8 @@ GIMG_API Gb gimgSetLineVAlpha(Gimg * const img, Gindex const x, Gindex const y, 
       sb = (Gn1) ((((Gi4) sb) * cia + cib) >> 8);
 
       // Set the color.
-      gimgValueSET_RGBA_N1(*buffer, sr, sg, sb, sa);
-      buffer  = buffer + rowOffset;
+      gimgValueSET_RN1_GN1_BN1_AN1(*((GimgValue *) buffer), sr, sg, sb, sa);
+      buffer += img->rowByteCount;
    }
 
    greturn gbTRUE;
@@ -1443,19 +1624,17 @@ func: gimgSetLineVInterpolate
 GIMG_API Gb gimgSetLineVInterpolate(Gimg * const img, Gindex const x, Gindex const y,
    Gcount const inh, GimgValue const pa, GimgValue const pb)
 {
-   GimgValue    *buffer,
-                 p;
-   Gindex        a,
-                 index;
-   Goffset       rowOffset;
-   Gcount        h;
-   Gn1           ra, rb,
-                 ga, gb,
-                 ba, bb,
-                 aa, ab;
-   GinterpI      ir,
-                 ig,
-                 ib;
+   Gn1      *buffer;
+   Gindex    a,
+             index;
+   Gcount    h;
+   Gn1       ra, rb,
+             ga, gb,
+             ba, bb,
+             aa, ab;
+   GinterpI  ir,
+             ig,
+             ib;
 
    genter;
 
@@ -1466,8 +1645,8 @@ GIMG_API Gb gimgSetLineVInterpolate(Gimg * const img, Gindex const x, Gindex con
    h = inh;
 
    // Get the color components of the input.
-   gimgValueGET_RGBA_N1(ra, ga, ba, aa, pa);
-   gimgValueGET_RGBA_N1(rb, gb, bb, ab, pb);
+   gimgValueGET_RN1_GN1_BN1_AN1(ra, ga, ba, aa, pa);
+   gimgValueGET_RN1_GN1_BN1_AN1(rb, gb, bb, ab, pb);
 
    // Set up the interpolators.
    ginterpISet(&ir, 0, (Gi4) ra, h, (Gi4) rb);
@@ -1488,21 +1667,19 @@ GIMG_API Gb gimgSetLineVInterpolate(Gimg * const img, Gindex const x, Gindex con
    // Set the buffer pointer.
    buffer    = img->valueData + index * img->rowByteCount + x * img->valueByteCount;
    a         = index + gMIN(img->height - index, h);
-   rowOffset = img->width;
 
    for (; index < a; index++)
    {
       // Get the current color.
-      gimgValueSET_RGBA_N1(
-         p,
+      gimgValueSET_RN1_GN1_BN1_AN1(
+         *((GimgValue *) buffer),
          (Gn1) ginterpIGetY1(&ir),
          (Gn1) ginterpIGetY1(&ig),
          (Gn1) ginterpIGetY1(&ib),
          aa);
 
       // Set the pixel
-      *buffer = p;
-      buffer  = buffer + rowOffset;
+      buffer += img->rowByteCount;
 
       // Interpolate the color step.
       ginterpIGetNext(&ir);
@@ -1512,6 +1689,7 @@ GIMG_API Gb gimgSetLineVInterpolate(Gimg * const img, Gindex const x, Gindex con
 
    greturn gbTRUE;
 }
+#endif
 
 /**************************************************************************************************
 func: gimgSetRect
@@ -1532,6 +1710,7 @@ GIMG_API Gb gimgSetRect(Gimg * const img, Gindex const x, Gindex const y, Gcount
    greturn gbTRUE;
 }
 
+#if 0
 /**************************************************************************************************
 func: gimgSetRectAlpha
 **************************************************************************************************/
@@ -1550,6 +1729,7 @@ GIMG_API Gb gimgSetRectAlpha(Gimg * const img, Gindex const x, Gindex const y, G
 
    greturn gbTRUE;
 }
+#endif
 
 /**************************************************************************************************
 func: gimgSetRectFill
@@ -1592,6 +1772,7 @@ GIMG_API Gb gimgSetRectFill(Gimg * const img, Gindex const x, Gindex const y, Gc
    greturn gbTRUE;
 }
 
+#if 0
 /**************************************************************************************************
 func: gimgSetRectFillAlpha
 **************************************************************************************************/
@@ -1662,8 +1843,8 @@ GIMG_API Gb gimgSetRectFillInterpolateH(Gimg * const img, Gindex const x, Gindex
    w = inw;
 
    // Get the color components of the input.
-   gimgValueGET_RGBA_N1(ra, ga, ba, aa, pa);
-   gimgValueGET_RGBA_N1(rb, gb, bb, ab, pb);
+   gimgValueGET_RN1_GN1_BN1_AN1(ra, ga, ba, aa, pa);
+   gimgValueGET_RN1_GN1_BN1_AN1(rb, gb, bb, ab, pb);
 
    // Set up the interpolators.
    ginterpISet(&ir, 0, (Gi4) ra, w, (Gi4) rb);
@@ -1687,7 +1868,7 @@ GIMG_API Gb gimgSetRectFillInterpolateH(Gimg * const img, Gindex const x, Gindex
    for (; index < a; index++)
    {
       // Get the current color.
-      gimgValueSET_RGBA_N1(
+      gimgValueSET_RN1_GN1_BN1_AN1(
          p,
          (Gn1) ginterpIGetY1(&ir),
          (Gn1) ginterpIGetY1(&ig),
@@ -1733,8 +1914,8 @@ GIMG_API Gb gimgSetRectFillInterpolateV(Gimg * const img, Gindex const x, Gindex
    h = inh;
 
    // Get the color components of the input.
-   gimgValueGET_RGBA_N1(ra, ga, ba, aa, pa);
-   gimgValueGET_RGBA_N1(rb, gb, bb, ab, pb);
+   gimgValueGET_RN1_GN1_BN1_AN1(ra, ga, ba, aa, pa);
+   gimgValueGET_RN1_GN1_BN1_AN1(rb, gb, bb, ab, pb);
 
    // Set up the interpolators.
    ginterpISet(&ir, 0, (Gi4) ra, h, (Gi4) rb);
@@ -1758,7 +1939,7 @@ GIMG_API Gb gimgSetRectFillInterpolateV(Gimg * const img, Gindex const x, Gindex
    for (; index < a; index++)
    {
       // Get the current color.
-      gimgValueSET_RGBA_N1(
+      gimgValueSET_RN1_GN1_BN1_AN1(
          p,
          (Gn1) ginterpIGetY1(&ir),
          (Gn1) ginterpIGetY1(&ig),
@@ -1777,7 +1958,6 @@ GIMG_API Gb gimgSetRectFillInterpolateV(Gimg * const img, Gindex const x, Gindex
    greturn gbTRUE;
 }
 
-#if 0
 /**************************************************************************************************
 func: gimgStore
 
@@ -1853,7 +2033,7 @@ GIMG_API Gb gimgStore(Gimg const * const img, Gpath const * const filePath, Gr c
       forCount(pixel, gimgGetWidth(img))
       {
          gimgGetColor(img, pixel, row, &color);
-         gimgValueGET_RGBA_N1(
+         gimgValueGET_RN1_GN1_BN1_AN1(
             buffer[pixel * 4 + 0],
             buffer[pixel * 4 + 1],
             buffer[pixel * 4 + 2],
@@ -1874,6 +2054,23 @@ gimgStoreERROR:
    greturn result;
 }
 #endif
+
+/**************************************************************************************************
+func: gimgSetValue
+**************************************************************************************************/
+GIMG_API Gb gimgSetValue(Gimg * const img, Gindex const x, Gindex const y, GimgValue const value)
+{
+   genter;
+
+   greturnFalseIf(
+      !img                       ||
+      x < 0  || img->width  <= x ||
+      y < 0  || img->height <= y);
+
+   SET_PIXEL_VALUE(img, y, x, value);
+
+   greturn gbTRUE;
+}
 
 /**************************************************************************************************
 func: gimgStart
@@ -1953,118 +2150,60 @@ GIMG_API Gb gimgSwapColor(Gimg * const img, GimgValue const originalColor,
 local:
 function:
 **************************************************************************************************/
+
+#if 0
 /**************************************************************************************************
-func: _ResizeFixedK
+func: _SetCircleLinesEven
 **************************************************************************************************/
-static Gb _ResizeFixedK(Gimg const * const simage, Gimg * const dimage)
+static void _SetCirclePixelsEven(Gimg * const img, Gindex const x, Gindex const y,
+   Gindex const offset, Gcount const width, Gindex const index, Gindex const step,
+   GimgValue const color)
 {
    genter;
-   greturn gbFALSE;
+   gimgSetValue(img, x + offset + index,     y             + step,   color);
+   gimgSetValue(img, x + offset - index - 1, y             + step,   color);
+   gimgSetValue(img, x + offset + index,     y + width - 1 - step,   color);
+   gimgSetValue(img, x + offset - index - 1, y + width - 1 - step,   color);
+   gimgSetValue(img, x             + step,   y + offset + index,     color);
+   gimgSetValue(img, x             + step,   y + offset - index - 1, color);
+   gimgSetValue(img, x + width - 1 - step,   y + offset + index,     color);
+   gimgSetValue(img, x + width - 1 - step,   y + offset - index - 1, color);
+   greturn;
 }
 
 /**************************************************************************************************
-func: _ResizeFixedKA
+func: _SetCircleLinesOdd
 **************************************************************************************************/
-static Gb _ResizeFixedKA(Gimg const * const simage, Gimg * const dimage)
+static void _SetCirclePixelsOdd(Gimg * const img, Gindex const x, Gindex const y,
+   Gindex const offset, Gcount const width, Gindex const index, Gindex const step,
+   GimgValue const color)
 {
    genter;
-   greturn gbFALSE;
+   gimgSetValue(img, x + offset + index,   y             + step, color);
+   gimgSetValue(img, x + offset - index,   y             + step, color);
+   gimgSetValue(img, x + offset + index,   y + width - 1 - step, color);
+   gimgSetValue(img, x + offset - index,   y + width - 1 - step, color);
+   gimgSetValue(img, x             + step, y + offset + index,   color);
+   gimgSetValue(img, x             + step, y + offset - index,   color);
+   gimgSetValue(img, x + width - 1 - step, y + offset + index,   color);
+   gimgSetValue(img, x + width - 1 - step, y + offset - index,   color);
+   greturn;
 }
 
 /**************************************************************************************************
-func: _ResizeFixedRGB
+func: _SetCircleLinesOddFirst
 **************************************************************************************************/
-static Gb _ResizeFixedRGB(Gimg const * const simage, Gimg * const dimage)
+static void _SetCircleLinesOddFirst(Gimg * const img, Gindex const x, Gindex const y,
+   Gindex const offset, Gcount const width, GimgValue const color)
 {
    genter;
-   greturn gbFALSE;
+   gimgSetValue(img, x + offset,    y,             color);
+   gimgSetValue(img, x + offset,    y + width - 1, color);
+
+   gimgSetLineH(img, x,             y + offset, width, color);
+   greturn;
 }
 
-/**************************************************************************************************
-func: _ResizeFixedRGBA
-**************************************************************************************************/
-static Gb _ResizeFixedRGBA(Gimg const * const simage, Gimg * const dimage)
-{
-   Gn1         r, g, b, a;
-   GimgValue   p;
-   Gindex      dx,  dy,
-               sx,  sy,
-               sampleX, sampleY;
-   Gcount      sampleCount,
-               dw,  dh,
-               sw,  sh,
-               unsampleCount;
-   Gn4         sumr, sumg, sumb, suma;
-
-   genter;
-
-   sw = simage->width;
-   sh = simage->height;
-   dw = dimage->width;
-   dh = dimage->height;
-
-   sampleX     = sw / dw;
-   sampleY     = sh / dh;
-   sampleCount = sampleX * sampleY;
-
-   forCount(dy, dh)
-   {
-      forCount(dx, dw)
-      {
-         unsampleCount = 0;
-         sumr          =
-            sumg       =
-            sumb       =
-            suma       = 0;
-
-         forCount(sy, sampleY)
-         {
-            forCount(sx, sampleX)
-            {
-               GET_PIXEL_VALUE(simage, dx, dy, &p);
-               gimgValueGET_RGBA_N1(r, g, b, a, p);
-
-               if (a == 0)
-               {
-                  unsampleCount++;
-               }
-               else
-               {
-                  sumr += r;
-                  sumg += g;
-                  sumb += b;
-               }
-               suma += a;
-            }
-         }
-
-         // Average the samples.
-         if (unsampleCount == sampleCount)
-         {
-            sumr = 0;
-            sumg = 0;
-            sumb = 0;
-            suma = 0;
-         }
-         else
-         {
-            sumr /= (sampleCount - unsampleCount);
-            sumg /= (sampleCount - unsampleCount);
-            sumb /= (sampleCount - unsampleCount);
-            suma /= sampleCount;
-         }
-
-         gimgValueSET_RGBA_N1(p, sumr, sumg, sumb, suma);
-         SET_PIXEL_VALUE(dimage, dx,dy, p);
-      }
-   }
-
-   greturn gbTRUE;
-}
-
-/**************************************************************************************************
-func: _SetCircleLines
-**************************************************************************************************/
 static void _SetCircleLines(Gimg * const img, Gindex const x, Gindex const y, Gindex const xx,
    Gindex const yy, GimgValue const color, Gb const isEven)
 {
@@ -2075,21 +2214,56 @@ static void _SetCircleLines(Gimg * const img, Gindex const x, Gindex const y, Gi
    gimgSetLineH(img, x - xx, y - yy,          2 * (xx + isEven), color);
    greturn;
 }
+#endif
 
 /**************************************************************************************************
-func: _SetCirclePixels
+func: _SetCirclePixelsEven
 **************************************************************************************************/
-static void _SetCirclePixels(Gimg * const img, Gindex const x, Gindex const y,
-   Gindex const xx, Gindex const yy, GimgValue const color, Gb const isEven)
+static void _SetCirclePixelsEven(Gimg * const img, Gindex const x, Gindex const y,
+   Gindex const offset, Gcount const width, Gindex const index, Gindex const step,
+   GimgValue const color)
 {
    genter;
-   gimgSetValue(img, x + xx + isEven, y + yy + isEven, color);
-   gimgSetValue(img, x + yy + isEven, y + xx + isEven, color);
-   gimgSetValue(img, x + yy + isEven, y - xx,          color);
-   gimgSetValue(img, x + xx + isEven, y - yy,          color);
-   gimgSetValue(img, x - xx,          y - yy,          color);
-   gimgSetValue(img, x - yy,          y - xx,          color);
-   gimgSetValue(img, x - yy,          y + xx + isEven, color);
-   gimgSetValue(img, x - xx,          y + yy + isEven, color);
+   gimgSetValue(img, x + offset + index,     y             + step,   color);
+   gimgSetValue(img, x + offset - index - 1, y             + step,   color);
+   gimgSetValue(img, x + offset + index,     y + width - 1 - step,   color);
+   gimgSetValue(img, x + offset - index - 1, y + width - 1 - step,   color);
+   gimgSetValue(img, x             + step,   y + offset + index,     color);
+   gimgSetValue(img, x             + step,   y + offset - index - 1, color);
+   gimgSetValue(img, x + width - 1 - step,   y + offset + index,     color);
+   gimgSetValue(img, x + width - 1 - step,   y + offset - index - 1, color);
+   greturn;
+}
+
+/**************************************************************************************************
+func: _SetCirclePixelsOdd
+**************************************************************************************************/
+static void _SetCirclePixelsOdd(Gimg * const img, Gindex const x, Gindex const y,
+   Gindex const offset, Gcount const width, Gindex const index, Gindex const step,
+   GimgValue const color)
+{
+   genter;
+   gimgSetValue(img, x + offset + index,   y             + step, color);
+   gimgSetValue(img, x + offset - index,   y             + step, color);
+   gimgSetValue(img, x + offset + index,   y + width - 1 - step, color);
+   gimgSetValue(img, x + offset - index,   y + width - 1 - step, color);
+   gimgSetValue(img, x             + step, y + offset + index,   color);
+   gimgSetValue(img, x             + step, y + offset - index,   color);
+   gimgSetValue(img, x + width - 1 - step, y + offset + index,   color);
+   gimgSetValue(img, x + width - 1 - step, y + offset - index,   color);
+   greturn;
+}
+
+/**************************************************************************************************
+func: _SetCirclePixelsOddFirst
+**************************************************************************************************/
+static void _SetCirclePixelsOddFirst(Gimg * const img, Gindex const x, Gindex const y,
+   Gindex const offset, Gcount const width, GimgValue const color)
+{
+   genter;
+   gimgSetValue(img, x + offset,    y,             color);
+   gimgSetValue(img, x + offset,    y + width - 1, color);
+   gimgSetValue(img, x,             y + offset,    color);
+   gimgSetValue(img, x + width - 1, y + offset,    color);
    greturn;
 }

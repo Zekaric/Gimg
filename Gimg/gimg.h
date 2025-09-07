@@ -58,30 +58,40 @@ typedef enum
 {
    gimgTypeNONE,
 
-   gimgTypeKN1,                  // Gray,           8 bit,  1 byte
-   gimgTypeKN2,                  // Gray,          16 bit,  2 byte
-   gimgTypeKN4,                  // Gray,          32 bit,  4 byte
-   gimgTypeKN8,                  // Gray,          64 bit,  8 byte
-   gimgTypeKR4,                  // Gray,                   4 byte
-   gimgTypeKR8,                  // Gray,                   8 byte
-   gimgTypeKN1_AN1,              // Gray  + Alhpa,          2 byte
-   gimgTypeKN2_AN2,              // Gray  + Alhpa,          4 byte
-   gimgTypeKN4_AN4,              // Gray  + Alhpa,          8 byte
-   gimgTypeKN8_AN8,              // Gray  + Alhpa,         16 byte
-   gimgTypeKR4_AR4,              // Gray  + Alhpa,          8 byte
-   gimgTypeKR8_AR8,              // Gray  + Alhpa,         16 byte
-   gimgTypeRN1_GN1_BN1,          // Color,         24 bit,  3 byte
-   gimgTypeRN2_GN2_BN2,          // Color,                  6 byte
-   gimgTypeRN4_GN4_BN4,          // Color,                 12 byte
-   gimgTypeRN8_GN8_BN8,          // Color,                 24 byte
-   gimgTypeRR4_GR4_BR4,          // Color,                 12 byte
-   gimgTypeRR8_GR8_BR8,          // Color,                 24 byte
-   gimgTypeRN1_GN1_BN1_AN1,      // Color + Alhpa, 32 bit,  4 byte
-   gimgTypeRN2_GN2_BN2_AN2,      // Color + Alhpa,          8 byte
-   gimgTypeRN4_GN4_BN4_AN4,      // Color + Alhpa,         16 byte
-   gimgTypeRN8_GN8_BN8_AN8,      // Color + Alhpa,         32 byte
-   gimgTypeRR4_GR4_BR4_AR4,      // Color + Alhpa,         16 byte
-   gimgTypeRR8_GR8_BR8_AR8,      // Color + Alhpa,         32 byte
+   gimgTypeN1              = 0x01000000,
+   gimgTypeN2              = 0x02000000,
+   gimgTypeN4              = 0x04000000,
+   gimgTypeN8              = 0x08000000,
+   gimgTypeR4              = 0x14000000,
+   gimgTypeR8              = 0x18000000,
+   gimgTypeK               = 0x00000010,
+   gimgTypeRGB             = 0x00011100,
+   gimgTypeA               = 0x00000001,
+
+   gimgTypeKN1             = gimgTypeK   |             gimgTypeN1,   // Gray,           8 bit,  1 byte
+   gimgTypeKN2             = gimgTypeK   |             gimgTypeN2,   // Gray,          16 bit,  2 byte
+   gimgTypeKN4             = gimgTypeK   |             gimgTypeN4,   // Gray,          32 bit,  4 byte
+   gimgTypeKN8             = gimgTypeK   |             gimgTypeN8,   // Gray,          64 bit,  8 byte
+   gimgTypeKR4             = gimgTypeK   |             gimgTypeR4,   // Gray,                   4 byte
+   gimgTypeKR8             = gimgTypeK   |             gimgTypeR8,   // Gray,                   8 byte
+   gimgTypeKN1_AN1         = gimgTypeK   | gimgTypeA | gimgTypeN1,   // Gray  + Alhpa,          2 byte
+   gimgTypeKN2_AN2         = gimgTypeK   | gimgTypeA | gimgTypeN2,   // Gray  + Alhpa,          4 byte
+   gimgTypeKN4_AN4         = gimgTypeK   | gimgTypeA | gimgTypeN4,   // Gray  + Alhpa,          8 byte
+   gimgTypeKN8_AN8         = gimgTypeK   | gimgTypeA | gimgTypeN8,   // Gray  + Alhpa,         16 byte
+   gimgTypeKR4_AR4         = gimgTypeK   | gimgTypeA | gimgTypeR4,   // Gray  + Alhpa,          8 byte
+   gimgTypeKR8_AR8         = gimgTypeK   | gimgTypeA | gimgTypeR8,   // Gray  + Alhpa,         16 byte
+   gimgTypeRN1_GN1_BN1     = gimgTypeRGB |             gimgTypeN1,   // Color,         24 bit,  3 byte
+   gimgTypeRN2_GN2_BN2     = gimgTypeRGB |             gimgTypeN2,   // Color,                  6 byte
+   gimgTypeRN4_GN4_BN4     = gimgTypeRGB |             gimgTypeN4,   // Color,                 12 byte
+   gimgTypeRN8_GN8_BN8     = gimgTypeRGB |             gimgTypeN8,   // Color,                 24 byte
+   gimgTypeRR4_GR4_BR4     = gimgTypeRGB |             gimgTypeR4,   // Color,                 12 byte
+   gimgTypeRR8_GR8_BR8     = gimgTypeRGB |             gimgTypeR8,   // Color,                 24 byte
+   gimgTypeRN1_GN1_BN1_AN1 = gimgTypeRGB | gimgTypeA | gimgTypeN1,   // Color + Alhpa, 32 bit,  4 byte
+   gimgTypeRN2_GN2_BN2_AN2 = gimgTypeRGB | gimgTypeA | gimgTypeN2,   // Color + Alhpa,          8 byte
+   gimgTypeRN4_GN4_BN4_AN4 = gimgTypeRGB | gimgTypeA | gimgTypeN4,   // Color + Alhpa,         16 byte
+   gimgTypeRN8_GN8_BN8_AN8 = gimgTypeRGB | gimgTypeA | gimgTypeN8,   // Color + Alhpa,         32 byte
+   gimgTypeRR4_GR4_BR4_AR4 = gimgTypeRGB | gimgTypeA | gimgTypeR4,   // Color + Alhpa,         16 byte
+   gimgTypeRR8_GR8_BR8_AR8 = gimgTypeRGB | gimgTypeA | gimgTypeR8,   // Color + Alhpa,         32 byte
    gimgTypePOINTER
 } GimgType;
 
@@ -153,7 +163,7 @@ typedef union
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-#define gimgCloc(VALUE_TYPE, W, H)                 (Gimg *) gleakCreate((void *) gimgCloc_(VALUE_TYPE, W, H), gsizeof(Gimg))
+#define gimgCloc(VALUE_TYPE, W, H)                 (Gimg *) gleakCloc((void *) gimgCloc_(VALUE_TYPE, W, H), gsizeof(Gimg))
 
 #define gimgGAMMAf                                 2.2f
 #define gimgGAMMA                                  2.2
@@ -173,49 +183,49 @@ GIMG_API Gb              gimgClipLineTest(            Gindex const denom, Gindex
 
 GIMG_API Gimg           *gimgCloc_(                                         GimgType const value, Gcount const width, Gcount const height);
 GIMG_API Gb              gimgClocContent(           Gimg       * const img, GimgType const value, Gcount const width, Gcount const height);
-GIMG_API Gn1            *gimgClocBufferBGR8(        Gimg const * const img);
-GIMG_API Gn1            *gimgClocBufferBGRA8(       Gimg const * const img);
-GIMG_API Gn1            *gimgClocBufferRGB8(        Gimg const * const img);
-GIMG_API Gn1            *gimgClocBufferRGBA8(       Gimg const * const img);
 
 GIMG_API void            gimgDloc(                 Gimg       * const img);
 GIMG_API void            gimgDlocContent(          Gimg       * const img);
 
-         Gr4            *gimgGetGammaTable(           void);
+         Gr             *gimgGetGammaTable(           void);
 GIMG_API Gcount          gimgGetHeight(               Gimg const * const img);
-         Gr4            *gimgGetPercentTable(         void);
+         Gr             *gimgGetPercentTable(         void);
 GIMG_API Gb              gimgGetValue(                Gimg const * const img, Gindex const x, Gindex const y, GimgValue * const color);
 GIMG_API Gcount          gimgGetWidth(                Gimg const * const img);
 
 GIMG_API Gb              gimgIsStarted(               void);
-GIMG_API Gb              gimgInit(                    Gimg       * const img);
 
+#if 0
 GIMG_API Gimg           *gimgLoad(                    Gpath const * const filePath);
+#endif
 
-GIMG_API Gb              gimgResizeFixed(             Gimg const * const simage, Gimg * const dimage);
+GIMG_API Gb              gimgResizeFixed_N1(             Gimg const * const simage, Gimg * const dimage);
 
 GIMG_API Gb              gimgSetCircle(               Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
+#if 0
 GIMG_API Gb              gimgSetCircleFill(           Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
+#endif
 GIMG_API Gb              gimgSetClear(                Gimg       * const img, GimgValue const color);
+#if 0
 GIMG_API Gb              gimgSetImage(                Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const value);
 GIMG_API Gb              gimgSetImageAlpha(           Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const value);
+#endif
 GIMG_API Gb              gimgSetLineH(                Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
+#if 0
 GIMG_API Gb              gimgSetLineHAlpha(           Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
 GIMG_API Gb              gimgSetLineHInterpolate(     Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color1, GimgValue const color2);
+#endif
 GIMG_API Gb              gimgSetLineV(                Gimg       * const img, Gindex const x, Gindex const y, Gcount const h, GimgValue const color);
+#if 0
 GIMG_API Gb              gimgSetLineVAlpha(           Gimg       * const img, Gindex const x, Gindex const y, Gcount const h, GimgValue const color);
 GIMG_API Gb              gimgSetLineVInterpolate(     Gimg       * const img, Gindex const x, Gindex const y, Gcount const h, GimgValue const color1, GimgValue const color2);
-GIMG_API Gb              gimgSetPixelColor(           Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
-GIMG_API Gb              gimgSetPixelA(               Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
-GIMG_API Gb              gimgSetPixelB(               Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
-GIMG_API Gb              gimgSetPixelDepth(           Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
-GIMG_API Gb              gimgSetPixelG(               Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
-GIMG_API Gb              gimgSetPixelMask(            Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
-GIMG_API Gb              gimgSetPixelR(               Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
-GIMG_API Gb              gimgSetValue(                Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
+#endif
 GIMG_API Gb              gimgSetRect(                 Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color);
+#if 0
 GIMG_API Gb              gimgSetRectAlpha(            Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color);
+#endif
 GIMG_API Gb              gimgSetRectFill(             Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color);
+#if 0
 GIMG_API Gb              gimgSetRectFillAlpha(        Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color);
 GIMG_API Gb              gimgSetRectFillInterpolate(  Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const colortl, GimgValue const colortr, GimgValue const colorbl, GimgValue const colorbr);
 GIMG_API Gb              gimgSetRectFillInterpolateH( Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color1, GimgValue const color2);
@@ -223,13 +233,23 @@ GIMG_API Gb              gimgSetRectFillInterpolateV( Gimg       * const img, Gi
 GIMG_API Gb              gimgSetRectInterpolate(      Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const colortl, GimgValue const colortr, GimgValue const colorbl, GimgValue const colorbr);
 GIMG_API Gb              gimgSetRectInterpolateH(     Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color1, GimgValue const color2);
 GIMG_API Gb              gimgSetRectInterpolateV(     Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color1, GimgValue const color2);
-GIMG_API Gb              gimgSetSize(                 Gimg       * const img, Gcount const width, Gcount const height);
+#endif
+GIMG_API Gb              gimgSetValue(                Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
 GIMG_API Gb              gimgStart(                   void);
 GIMG_API Gb              gimgStop(                    void);
+#if 0
 GIMG_API Gb              gimgStore(                   Gimg const * const img, Gpath const * const filePath, Gr const compression);
+#endif
 GIMG_API Gb              gimgSwapColor(               Gimg       * const img, GimgValue const originalColor, GimgValue const newColor);
 
-#define gimgValueSET_RGBA_N1(COLOR, R, G, B, A) \
+#define gimgValueSET_RN1_GN1_BN1(COLOR, R, G, B) \
+(\
+   (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_R] = (Gn1) (R),\
+   (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_G] = (Gn1) (G),\
+   (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_B] = (Gn1) (B),\
+   (COLOR)\
+)
+#define gimgValueSET_RN1_GN1_BN1_AN1(COLOR, R, G, B, A) \
 (\
    (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_R] = (Gn1) (R),\
    (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_G] = (Gn1) (G),\
@@ -237,33 +257,38 @@ GIMG_API Gb              gimgSwapColor(               Gimg       * const img, Gi
    (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_A] = (Gn1) (A),\
    (COLOR)\
 )
-#define gimgValueGET_RGBA_N1(R, G, B, A, COLOR) \
+#define gimgValueGET_RN1_GN1_BN1(R, G, B, COLOR) \
+{\
+   R = (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_R];\
+   G = (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_G];\
+   B = (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_B];\
+}
+#define gimgValueGET_RN1_GN1_BN1_AN1(R, G, B, A, COLOR) \
 {\
    R = (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_R];\
    G = (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_G];\
    B = (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_B];\
    A = (COLOR).rn1_gn1_bn1_an1[gimgValueIndexRGB_A];\
 }
-#define gimgValueDecompileRGBA_N1A(COLOR) (COLOR).n1[gimgValueRGB_A_INDEX]
 
-#define gimgValueGetTransparent(COLOR) gimgValueCompileRGBA_N1(COLOR,   0,   0,   0,   0)
-#define gimgValueGetBlack(COLOR)       gimgValueCompileRGBA_N1(COLOR,   0,   0,   0, 255)
-#define gimgValueGetWhite(COLOR)       gimgValueCompileRGBA_N1(COLOR, 255, 255, 255, 255)
-#define gimgValueGetGrayDark(COLOR)    gimgValueCompileRGBA_N1(COLOR,  64,  64,  64, 255)
-#define gimgValueGetGray(COLOR)        gimgValueCompileRGBA_N1(COLOR, 128, 128, 128, 255)
-#define gimgValueGetGrayLight(COLOR)   gimgValueCompileRGBA_N1(COLOR, 192, 192, 192, 255)
-#define gimgValueGetRed(COLOR)         gimgValueCompileRGBA_N1(COLOR, 255,   0,   0, 255)
-#define gimgValueGetOrange(COLOR)      gimgValueCompileRGBA_N1(COLOR, 255, 128,   0, 255)
-#define gimgValueGetYellow(COLOR)      gimgValueCompileRGBA_N1(COLOR, 255, 255,   0, 255)
-#define gimgValueGetGreenYellow(COLOR) gimgValueCompileRGBA_N1(COLOR, 128, 255,   0, 255)
-#define gimgValueGetGreen(COLOR)       gimgValueCompileRGBA_N1(COLOR,   0, 255,   0, 255)
-#define gimgValueGetGreenCyan(COLOR)   gimgValueCompileRGBA_N1(COLOR,   0, 255, 128, 255)
-#define gimgValueGetCyan(COLOR)        gimgValueCompileRGBA_N1(COLOR,   0, 255, 255, 255)
-#define gimgValueGetBlueCyan(COLOR)    gimgValueCompileRGBA_N1(COLOR,   0, 128, 255, 255)
-#define gimgValueGetBlue(COLOR)        gimgValueCompileRGBA_N1(COLOR,   0,   0, 255, 255)
-#define gimgValueGetBluePurple(COLOR)  gimgValueCompileRGBA_N1(COLOR, 128,   0, 255, 255)
-#define gimgValueGetPurple(COLOR)      gimgValueCompileRGBA_N1(COLOR, 255,   0, 255, 255)
-#define gimgValueGetRedPurple(COLOR)   gimgValueCompileRGBA_N1(COLOR, 255,   0, 128, 255)
+#define gimgValueGET_TRANSPARENT_N1(COLOR) gimgValueSET_RN1_GN1_BN1_AN1(COLOR,   0,   0,   0,   0)
+#define gimgValueGET_BLACK_N1(COLOR)       gimgValueSET_RN1_GN1_BN1_AN1(COLOR,   0,   0,   0, 255)
+#define gimgValueGET_WHITE_N1(COLOR)       gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 255, 255, 255, 255)
+#define gimgValueGET_GRAYDARK_N1(COLOR)    gimgValueSET_RN1_GN1_BN1_AN1(COLOR,  64,  64,  64, 255)
+#define gimgValueGET_GRAY_N1(COLOR)        gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 128, 128, 128, 255)
+#define gimgValueGET_GRAYLIGHT_N1(COLOR)   gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 192, 192, 192, 255)
+#define gimgValueGET_RED_N1(COLOR)         gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 255,   0,   0, 255)
+#define gimgValueGET_ORANGE_N1(COLOR)      gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 255, 128,   0, 255)
+#define gimgValueGET_YELLOW_N1(COLOR)      gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 255, 255,   0, 255)
+#define gimgValueGET_GREENYELLOW_N1(COLOR) gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 128, 255,   0, 255)
+#define gimgValueGET_GREEN_N1(COLOR)       gimgValueSET_RN1_GN1_BN1_AN1(COLOR,   0, 255,   0, 255)
+#define gimgValueGET_GREENCYAN_N1(COLOR)   gimgValueSET_RN1_GN1_BN1_AN1(COLOR,   0, 255, 128, 255)
+#define gimgValueGET_CYAN_N1(COLOR)        gimgValueSET_RN1_GN1_BN1_AN1(COLOR,   0, 255, 255, 255)
+#define gimgValueGET_BLUECYAN_N1(COLOR)    gimgValueSET_RN1_GN1_BN1_AN1(COLOR,   0, 128, 255, 255)
+#define gimgValueGET_BLUE_N1(COLOR)        gimgValueSET_RN1_GN1_BN1_AN1(COLOR,   0,   0, 255, 255)
+#define gimgValueGET_BLUEPURPLE_N1(COLOR)  gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 128,   0, 255, 255)
+#define gimgValueGET_PURPLE_N1(COLOR)      gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 255,   0, 255, 255)
+#define gimgValueGET_REDPURPLE_N1(COLOR)   gimgValueSET_RN1_GN1_BN1_AN1(COLOR, 255,   0, 128, 255)
 
 /*************************************************************************************************/
 #ifdef __cplusplus
