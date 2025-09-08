@@ -33,12 +33,12 @@ TEST(Gimg, Cloc)
    grlStart();
    gimgStart();
 
-   img = gimgCloc(gimgTypeRN1_GN1_BN1_AN1, 8, 8);
+   img = gimgCloc(gimgTypeRGBA_N1, 8, 8);
    EXPECT_TRUE(img != nullptr);
 
    EXPECT_TRUE(img->width           == 8);
    EXPECT_TRUE(img->height          == 8);
-   EXPECT_TRUE(img->valueType       == gimgTypeRN1_GN1_BN1_AN1);
+   EXPECT_TRUE(img->valueType       == gimgTypeRGBA_N1);
    EXPECT_TRUE(img->valueByteCount  == 4);
    EXPECT_TRUE(img->rowByteCount    == 8 * 4);
 
@@ -46,7 +46,7 @@ TEST(Gimg, Cloc)
    pixelCount = 8 * 8;
    forCount(pixelIndex, pixelCount)
    {
-      gimgValueGET_RN1_GN1_BN1_AN1(r, g, b, a, *((GimgValue *) data));
+      gimgValueGET_RGBA_N1(*((GimgValue *) data), r, g, b, a);
       EXPECT_TRUE(r == 0 && g == 0 && b == 0 && a == 0);
 
       data += img->valueByteCount;
@@ -54,7 +54,7 @@ TEST(Gimg, Cloc)
 
    gimgDloc(img);
 
-   img = gimgCloc(gimgTypeRN1_GN1_BN1, 8, 8);
+   img = gimgCloc(gimgTypeRGB_N1, 8, 8);
    EXPECT_TRUE(img != nullptr);
 
    EXPECT_TRUE(img->valueByteCount  == 3);
@@ -63,7 +63,7 @@ TEST(Gimg, Cloc)
    data = img->valueData;
    forCount(pixelIndex, pixelCount)
    {
-      gimgValueGET_RN1_GN1_BN1(r, g, b, *((GimgValue *) data));
+      gimgValueGET_RGBA_N1(*((GimgValue *) data), r, g, b, a);
       EXPECT_TRUE(r == 0 && g == 0 && b == 0);
 
       data += img->valueByteCount;
@@ -95,7 +95,7 @@ TEST(Gimg, SetClear)
 
    gmemClearType(&color, GimgValue);
 
-   img = gimgCloc(gimgTypeRN1_GN1_BN1_AN1, 8, 8);
+   img = gimgCloc(gimgTypeRGBA_N1, 8, 8);
 
    gimgValueGET_WHITE_N1(color);
    gimgSetClear(img, color);
@@ -104,7 +104,7 @@ TEST(Gimg, SetClear)
    pixelCount = 8 * 8;
    forCount(pixelIndex, pixelCount)
    {
-      gimgValueGET_RN1_GN1_BN1_AN1(r, g, b, a, *((GimgValue *) data));
+      gimgValueGET_RGBA_N1(*((GimgValue *) data), r, g, b, a);
       EXPECT_TRUE(r == 255 && g == 255 && b == 255 && a == 255);
 
       data += img->valueByteCount;
@@ -136,7 +136,7 @@ TEST(Gimg, SetLineHAndV)
 
    gmemClearType(&color, GimgValue);
 
-   img = gimgCloc(gimgTypeRN1_GN1_BN1_AN1, 8, 8);
+   img = gimgCloc(gimgTypeRGBA_N1, 8, 8);
 
    // Set the background to white.
    gimgValueGET_WHITE_N1(color);
@@ -153,7 +153,7 @@ TEST(Gimg, SetLineHAndV)
    pixelCount = 8 * 8;
    forCount(pixelIndex, pixelCount)
    {
-      gimgValueGET_RN1_GN1_BN1_AN1(r, g, b, a, *((GimgValue *) data));
+      gimgValueGET_RGBA_N1(*((GimgValue *) data), r, g, b, a);
 
       if (pixelIndex % 8 == 0 ||
           pixelIndex % 8 == 7 ||
@@ -197,7 +197,7 @@ TEST(Gimg, SetCircle)
 
    gmemClearType(&color, GimgValue);
 
-   img = gimgCloc(gimgTypeRN1_GN1_BN1_AN1, 8, 8);
+   img = gimgCloc(gimgTypeRGBA_N1, 8, 8);
 
    forCount(radius, 16)
    {
