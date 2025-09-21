@@ -279,13 +279,6 @@ static Gn1   _fToNTableN1[256];
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-static void  _SetCircleLinesEven(      Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, Gindex const index, Gindex const step, GimgValue const color);
-static void  _SetCircleLinesOdd(       Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, Gindex const index, Gindex const step, GimgValue const color);
-static void  _SetCircleLinesOddFirst(  Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, GimgValue const color);
-
-static void  _SetCirclePixelsEven(     Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, Gindex const index, Gindex const step, GimgValue const color);
-static void  _SetCirclePixelsOdd(      Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width, Gindex const index, Gindex const step, GimgValue const color);
-static void  _SetCirclePixelsOddFirst( Gimg       * const img, Gindex const x, Gindex const y, Gindex const offset, Gcount const width,                                        GimgValue const color);
 
 /**************************************************************************************************
 global:
@@ -407,6 +400,37 @@ GIMG_API Gimg *gimgCloc_(GimgType const value, Gcount const width, Gcount const 
    }
 
    greturn img;
+}
+
+/**************************************************************************************************
+func: gimgClocClone
+**************************************************************************************************/
+GIMG_API Gimg *gimgClocClone(Gimg const * const img)
+{
+   Gimg *clone;
+
+   genter;
+
+   greturnNullIf(
+      !_isStarted ||
+      !img);
+
+   // Create the clone image.
+   clone = gimgCloc(img->valueType, img->width, img->height);
+   greturnNullIf(!clone);
+
+   // Copy the image data.
+   if (!gmemCopyOverTypeArray(
+         clone->valueData,
+         Gn1,
+         img->height * img->rowByteCount,
+         img->valueData))
+   {
+      gimgDloc(clone);
+      greturn NULL;
+   }
+
+   greturn clone;
 }
 
 /**************************************************************************************************
@@ -673,99 +697,6 @@ GIMG_API Gimg *gimgLoad(Gpath const * const filePath)
 #endif
 
 /**************************************************************************************************
-func: gimgResizeFixed_1
-
-Resizes an image that is an exact multiple of another image.
-Works for N1 and F1 images only.
-**************************************************************************************************/
-GIMG_API Gb gimgResizeFixed_1(Gimg const * const simage, Gimg * const dimage)
-{
-   Gn1         r, g, b, a;
-   GimgValue   p;
-   Gindex      dx,  dy,
-               sx,  sy,
-               sampleX, sampleY;
-   Gcount      sampleCount,
-               dw,  dh,
-               sw,  sh,
-               unsampleCount;
-   Gn4         sumr, sumg, sumb, suma;
-
-   genter;
-
-   greturnFalseIf(
-      !simage ||
-      !dimage ||
-      !(simage->valueType & gimgType1 &&
-        dimage->valueType & gimgType1));
-
-   sw = simage->width;
-   sh = simage->height;
-   dw = dimage->width;
-   dh = dimage->height;
-
-   sampleX     = sw / dw;
-   sampleY     = sh / dh;
-   sampleCount = sampleX * sampleY;
-
-   forCount(dy, dh)
-   {
-      forCount(dx, dw)
-      {
-         unsampleCount = 0;
-         sumr          =
-            sumg       =
-            sumb       =
-            suma       = 0;
-
-         forCount(sy, sampleY)
-         {
-            forCount(sx, sampleX)
-            {
-               GET_PIXEL_VALUE(simage, dx, dy, p);
-               VALUE_TYPE_TO_RGBA_N1(simage->valueType, p);
-               VALUE_GET_RGBA_N1(p, r, g, b, a);
-
-               if (a == 0)
-               {
-                  unsampleCount++;
-               }
-               else
-               {
-                  sumr += r;
-                  sumg += g;
-                  sumb += b;
-               }
-               suma += a;
-            }
-         }
-
-         // Average the samples.
-         if (unsampleCount == sampleCount)
-         {
-            sumr = 0;
-            sumg = 0;
-            sumb = 0;
-            suma = 0;
-         }
-         else
-         {
-            sumr /= (sampleCount - unsampleCount);
-            sumg /= (sampleCount - unsampleCount);
-            sumb /= (sampleCount - unsampleCount);
-            suma /= sampleCount;
-         }
-
-         VALUE_SET_RGBA_N1(p, sumr, sumg, sumb, suma);
-         VALUE_RGBA_N1_TO_TYPE(dimage->valueType, p);
-         SET_PIXEL_VALUE(dimage, dx, dy, p);
-      }
-   }
-
-   greturn gbTRUE;
-}
-
-/**************************************************************************************************
 func: gimgSetCircle
 
 Why am I not using a midpoint integer base scan conversion circle routine?  I did have this
@@ -779,7 +710,11 @@ GIMG_API Gb gimgSetCircle(Gimg * const img, Gindex const inx, Gindex const iny, 
    Gindex offset,
           radius,
           index,
-          step;
+          step,
+          xCenter,
+          yCenter,
+          xMax,
+          yMax;
    Gr4    xr,
           xrsq,
           y1,
@@ -820,24 +755,30 @@ GIMG_API Gb gimgSetCircle(Gimg * const img, Gindex const inx, Gindex const iny, 
       offset    =
          radius = (w - 1) / 2;
 
+      xCenter   = inx + offset;
+      yCenter   = iny + offset;
+      xMax      = inx + w - 1;
+      yMax      = iny + w - 1;
+
       rsq = (Gr4) (radius * radius);
       xr  = 0;
       y1  = (Gr4)  radius;
       y2  = (Gr4) (radius - 1);
 
       // First iteration is 4 symetry.
-      _SetCirclePixelsOddFirst(img, inx, iny, offset, w, color);
+      gimgSetValue(img, xCenter, iny,     color);
+      gimgSetValue(img, xCenter, yMax,    color);
+      gimgSetValue(img, inx,     yCenter, color);
+      gimgSetValue(img, xMax,    yCenter, color);
 
       step = 0;
-      for (index = 1; index < offset; index++)
+      for (index = 1; index + step <= offset; index++)
       {
          xr = (Gr4) index;
          y1 = (Gr4)  radius - step;
          y2 = (Gr4) (radius - step - 1);
 
          xrsq = xr * xr;
-         breakIf(xrsq + 0.5 >= rsq);
-
          y1sq = y1 * y1;
          y2sq = y2 * y2;
 
@@ -855,7 +796,14 @@ GIMG_API Gb gimgSetCircle(Gimg * const img, Gindex const inx, Gindex const iny, 
          {
             step++;
          }
-         _SetCirclePixelsOdd(img, inx, iny, offset, w, index, step, color);
+         gimgSetValue(img, xCenter + index, iny  + step,     color);
+         gimgSetValue(img, xCenter - index, iny  + step,     color);
+         gimgSetValue(img, xCenter + index, yMax - step,     color);
+         gimgSetValue(img, xCenter - index, yMax - step,     color);
+         gimgSetValue(img, inx  + step,     yCenter + index, color);
+         gimgSetValue(img, inx  + step,     yCenter - index, color);
+         gimgSetValue(img, xMax - step,     yCenter + index, color);
+         gimgSetValue(img, xMax - step,     yCenter - index, color);
       }
    }
    // Dealing with an even width.  Symetric around a pixel boundary.
@@ -878,23 +826,33 @@ GIMG_API Gb gimgSetCircle(Gimg * const img, Gindex const inx, Gindex const iny, 
       offset    =  w      / 2;
          radius = (w - 1) / 2;
 
+      xCenter = inx + offset;
+      yCenter = iny + offset;
+      xMax    = inx + w - 1;
+      yMax    = iny + w - 1;
+
       rsq = (Gr4) (radius + 0.5f) * (radius + 0.5f);
       xr  = 0.5f;
       y1  = (Gr4) radius + 0.5f;
       y2  = (Gr4) radius - 0.5f;
 
-      _SetCirclePixelsEven(img, inx, iny, offset, w, 0, 0, color);
+      gimgSetValue(img, xCenter,     iny,         color);
+      gimgSetValue(img, xCenter - 1, iny,         color);
+      gimgSetValue(img, xCenter,     yMax,        color);
+      gimgSetValue(img, xCenter - 1, yMax,        color);
+      gimgSetValue(img, inx,         yCenter,     color);
+      gimgSetValue(img, inx,         yCenter - 1, color);
+      gimgSetValue(img, xMax,        yCenter,     color);
+      gimgSetValue(img, xMax,        yCenter - 1, color);
 
       step = 0;
-      for (index = 1; index < offset; index++)
+      for (index = 1; index + step < offset; index++)
       {
          xr = (Gr4) index + 0.5f;
          y1 = (Gr4) (radius - step) + 0.5f;
          y2 = (Gr4) (radius - step) - 0.5f;
 
-          xrsq = xr * xr;
-         breakIf(xrsq + 0.5 >= rsq);
-
+         xrsq = xr * xr;
          y1sq = y1 * y1;
          y2sq = y2 * y2;
 
@@ -912,7 +870,14 @@ GIMG_API Gb gimgSetCircle(Gimg * const img, Gindex const inx, Gindex const iny, 
          {
             step++;
          }
-         _SetCirclePixelsEven(img, inx, iny, offset, w, index, step, color);
+         gimgSetValue(img, xCenter + index,     iny  + step,         color);
+         gimgSetValue(img, xCenter - index - 1, iny  + step,         color);
+         gimgSetValue(img, xCenter + index,     yMax - step,         color);
+         gimgSetValue(img, xCenter - index - 1, yMax - step,         color);
+         gimgSetValue(img, inx  + step,         yCenter + index,     color);
+         gimgSetValue(img, inx  + step,         yCenter - index - 1, color);
+         gimgSetValue(img, xMax - step,         yCenter + index,     color);
+         gimgSetValue(img, xMax - step,         yCenter - index - 1, color);
       }
    }
 
@@ -933,7 +898,15 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
    Gindex offset,
           radius,
           index,
-          step;
+          step,
+          xCenter,
+          yCenter,
+          xMax,
+          yMax,
+          xPending,
+          yTopPending,
+          yBotPending,
+          wPending;
    Gr4    xr,
           xrsq,
           y1,
@@ -948,8 +921,7 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
 
    greturnFalseIf(w <= 0);
 
-   greturnIf(w == 1, gimgSetValue( img, inx, iny,    color));
-   greturnIf(w == 2, gimgSetCircle(img, inx, iny, w, color));
+   greturnIf(w == 1, gimgSetValue(img, inx, iny, color));
 
    // Dealing with an odd width.  Symetric around a central pixel.
    //     +---------------+ w (3, 5, 7, ...)
@@ -975,24 +947,31 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
       offset    =
          radius = (w - 1) / 2;
 
+      xCenter   = inx + offset;
+      yCenter   = iny + offset;
+      xMax      = inx + w - 1;
+      yMax      = iny + w - 1;
+
       rsq = (Gr4) (radius * radius);
       xr  = 0;
       y1  = (Gr4)  radius;
       y2  = (Gr4) (radius - 1);
 
       // First iteration is 4 symetry.
-      _SetCircleLinesOddFirst(img, inx, iny, offset, w, color);
+      xPending    = xCenter;
+      yTopPending = iny;
+      yBotPending = yMax;
+      wPending    = 1;
+      gimgSetLineH(img, inx,     yCenter, w, color);
 
       step = 0;
-      for (index = 1; index < offset; index++)
+      for (index = 1; index + step <= offset; index++)
       {
          xr = (Gr4) index;
          y1 = (Gr4)  radius - step;
          y2 = (Gr4) (radius - step - 1);
 
          xrsq = xr * xr;
-         breakIf(xrsq + 0.5 >= rsq);
-
          y1sq = y1 * y1;
          y2sq = y2 * y2;
 
@@ -1008,9 +987,16 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
          // If d2 is closer to 0, closer to the radius, then we need to step y down.
          if (d2 < d1)
          {
+            gimgSetLineH(img, xPending, yTopPending, wPending, color);
+            gimgSetLineH(img, xPending, yBotPending, wPending, color);
             step++;
          }
-         _SetCircleLinesOdd(img, inx, iny, offset, w, index, step, color);
+         xPending    = xCenter - index;
+         yTopPending = iny  + step;
+         yBotPending = yMax - step;
+         wPending    = index * 2 + 1;
+         gimgSetLineH(img, inx  + step,     yCenter + index, w - 2 * step,  color);
+         gimgSetLineH(img, inx  + step,     yCenter - index, w - 2 * step,  color);
       }
    }
    // Dealing with an even width.  Symetric around a pixel boundary.
@@ -1033,23 +1019,31 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
       offset    =  w      / 2;
          radius = (w - 1) / 2;
 
+      xCenter = inx + offset;
+      yCenter = iny + offset;
+      xMax    = inx + w - 1;
+      yMax    = iny + w - 1;
+
       rsq = (Gr4) (radius + 0.5f) * (radius + 0.5f);
       xr  = 0.5f;
       y1  = (Gr4) radius + 0.5f;
       y2  = (Gr4) radius - 0.5f;
 
-      _SetCircleLinesEven(img, inx, iny, offset, w, 0, 0, color);
+      xPending    = xCenter - 1;
+      yTopPending = iny;
+      yBotPending = yMax;
+      wPending    = 2;
+      gimgSetLineH(img, inx,         yCenter,     w, color);
+      gimgSetLineH(img, inx,         yCenter - 1, w, color);
 
       step = 0;
-      for (index = 1; index < offset; index++)
+      for (index = 1; index + step < offset; index++)
       {
          xr = (Gr4) index + 0.5f;
          y1 = (Gr4) (radius - step) + 0.5f;
          y2 = (Gr4) (radius - step) - 0.5f;
 
-          xrsq = xr * xr;
-         breakIf(xrsq + 0.5 >= rsq);
-
+         xrsq = xr * xr;
          y1sq = y1 * y1;
          y2sq = y2 * y2;
 
@@ -1065,9 +1059,16 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
          // If d2 is closer to 0, closer to the radius, then we need to step y down.
          if (d2 < d1)
          {
+            gimgSetLineH(img, xPending, yTopPending, wPending, color);
+            gimgSetLineH(img, xPending, yBotPending, wPending, color);
             step++;
          }
-         _SetCircleLinesEven(img, inx, iny, offset, w, index, step, color);
+         xPending    = xCenter - index - 1;
+         yTopPending = iny  + step;
+         yBotPending = yMax - step;
+         wPending    = index * 2 + 2;
+         gimgSetLineH(img, inx  + step,         yCenter + index,     w - 2 * step,  color);
+         gimgSetLineH(img, inx  + step,         yCenter - index - 1, w - 2 * step,  color);
       }
    }
 
@@ -1165,13 +1166,11 @@ GIMG_API Gb gimgSetImage(Gimg * const img, Gindex const x, Gindex const y, Gimg 
    // Copy the image information.
    for (; iy < ih; iy++, vy++)
    {
-      gmemCopyOverTypeArrayAt(
-         vValueData,
-         Gn,
-         vw                       * valueByteCount,
-         (vy * value->width + vx) * valueByteCount,
-         iValueData,
-         (iy * img->width   + ix) * valueByteCount);
+      gmemCopyOverTypeArray(
+         iValueData + iy * img->rowByteCount + ix * img->valueByteCount,
+         Gn1,
+         vw * img->valueByteCount,
+         vValueData + vy * img->rowByteCount + vx * img->valueByteCount);
    }
 
    greturn gbTRUE;
@@ -2169,6 +2168,100 @@ GIMG_API Gb gimgSetRectFillInterpolateV(Gimg * const img, Gindex const x, Gindex
    greturn gbTRUE;
 }
 
+/**************************************************************************************************
+func: gimgSetResizeFixed_1
+
+Resizes an image that is an exact multiple of another image.
+Images need to be of 1 byte type per channel.
+**************************************************************************************************/
+GIMG_API Gb gimgSetResizeFixed_1(Gimg * const img, Gimg const * const valueImg)
+{
+   Gn1         r, g, b, a;
+   GimgValue   p;
+   Gindex      dx,  dy,
+               sx,  sy,
+               sampleX, sampleY;
+   Gcount      sampleCount,
+               dw,  dh,
+               sw,  sh,
+               unsampleCount;
+   Gn4         sumr, sumg, sumb, suma;
+
+   genter;
+
+   greturnFalseIf(
+      !img      ||
+      !valueImg ||
+      !(img->valueType      & gimgType1 &&
+        valueImg->valueType & gimgType1));
+
+   sw = valueImg->width;
+   sh = valueImg->height;
+   dw = img->width;
+   dh = img->height;
+
+   sampleX     = sw / dw;
+   sampleY     = sh / dh;
+   sampleCount = sampleX * sampleY;
+
+   // Parrallelize this loop
+   forCount(dy, dh)
+   {
+      forCount(dx, dw)
+      {
+         unsampleCount = 0;
+         sumr          =
+            sumg       =
+            sumb       =
+            suma       = 0;
+
+         forCount(sy, sampleY)
+         {
+            forCount(sx, sampleX)
+            {
+               GET_PIXEL_VALUE(valueImg, dx * sampleX + sx, dy * sampleY + sy, p);
+               VALUE_TYPE_TO_RGBA_N1(valueImg->valueType, p);
+               VALUE_GET_RGBA_N1(p, r, g, b, a);
+
+               if (a == 0)
+               {
+                  unsampleCount++;
+               }
+               else
+               {
+                  sumr += r;
+                  sumg += g;
+                  sumb += b;
+               }
+               suma += a;
+            }
+         }
+
+         // Average the samples.
+         if (unsampleCount == sampleCount)
+         {
+            sumr = 0;
+            sumg = 0;
+            sumb = 0;
+            suma = 0;
+         }
+         else
+         {
+            sumr /= (sampleCount - unsampleCount);
+            sumg /= (sampleCount - unsampleCount);
+            sumb /= (sampleCount - unsampleCount);
+            suma /= sampleCount;
+         }
+
+         VALUE_SET_RGBA_N1(p, sumr, sumg, sumb, suma);
+         VALUE_RGBA_N1_TO_TYPE(img->valueType, p);
+         SET_PIXEL_VALUE(img, dx, dy, p);
+      }
+   }
+
+   greturn gbTRUE;
+}
+
 #if 0
 /**************************************************************************************************
 func: gimgStore
@@ -2375,101 +2468,3 @@ GIMG_API Gb gimgSwapColor(Gimg * const img, GimgValue const originalColor,
 local:
 function:
 **************************************************************************************************/
-
-/**************************************************************************************************
-func: _SetCircleLinesEven
-**************************************************************************************************/
-static void _SetCircleLinesEven(Gimg * const img, Gindex const x, Gindex const y,
-   Gindex const offset, Gcount const width, Gindex const index, Gindex const step,
-   GimgValue const color)
-{
-   genter;
-   gimgSetLineH(img, x + offset - index - 1, y             + step,   2 * index,  color);
-   gimgSetLineH(img, x + offset - index - 1, y + width - 1 - step,   2 * index,  color);
-
-   gimgSetLineH(img, x             + step,   y + offset + index,     width - 2 * step, color);
-   gimgSetLineH(img, x             + step,   y + offset - index - 1, width - 2 * step, color);
-   greturn;
-}
-
-/**************************************************************************************************
-func: _SetCircleLinesOdd
-**************************************************************************************************/
-static void _SetCircleLinesOdd(Gimg * const img, Gindex const x, Gindex const y,
-   Gindex const offset, Gcount const width, Gindex const index, Gindex const step,
-   GimgValue const color)
-{
-   genter;
-   gimgSetLineH(img, x + offset - index,   y             + step, 2 * index + 1, color);
-   gimgSetLineH(img, x + offset - index,   y + width - 1 - step, 2 * index + 1, color);
-
-   gimgSetLineH(img, x             + step, y + offset + index,   width - 2 * step,   color);
-   gimgSetLineH(img, x             + step, y + offset - index,   width - 2 * step,   color);
-   greturn;
-}
-
-/**************************************************************************************************
-func: _SetCircleLinesOddFirst
-**************************************************************************************************/
-static void _SetCircleLinesOddFirst(Gimg * const img, Gindex const x, Gindex const y,
-   Gindex const offset, Gcount const width, GimgValue const color)
-{
-   genter;
-   gimgSetValue(img, x + offset,    y,             color);
-   gimgSetValue(img, x + offset,    y + width - 1, color);
-
-   gimgSetLineH(img, x,             y + offset, width, color);
-   greturn;
-}
-
-/**************************************************************************************************
-func: _SetCirclePixelsEven
-**************************************************************************************************/
-static void _SetCirclePixelsEven(Gimg * const img, Gindex const x, Gindex const y,
-   Gindex const offset, Gcount const width, Gindex const index, Gindex const step,
-   GimgValue const color)
-{
-   genter;
-   gimgSetValue(img, x + offset + index,     y             + step,   color);
-   gimgSetValue(img, x + offset - index - 1, y             + step,   color);
-   gimgSetValue(img, x + offset + index,     y + width - 1 - step,   color);
-   gimgSetValue(img, x + offset - index - 1, y + width - 1 - step,   color);
-   gimgSetValue(img, x             + step,   y + offset + index,     color);
-   gimgSetValue(img, x             + step,   y + offset - index - 1, color);
-   gimgSetValue(img, x + width - 1 - step,   y + offset + index,     color);
-   gimgSetValue(img, x + width - 1 - step,   y + offset - index - 1, color);
-   greturn;
-}
-
-/**************************************************************************************************
-func: _SetCirclePixelsOdd
-**************************************************************************************************/
-static void _SetCirclePixelsOdd(Gimg * const img, Gindex const x, Gindex const y,
-   Gindex const offset, Gcount const width, Gindex const index, Gindex const step,
-   GimgValue const color)
-{
-   genter;
-   gimgSetValue(img, x + offset + index,   y             + step, color);
-   gimgSetValue(img, x + offset - index,   y             + step, color);
-   gimgSetValue(img, x + offset + index,   y + width - 1 - step, color);
-   gimgSetValue(img, x + offset - index,   y + width - 1 - step, color);
-   gimgSetValue(img, x             + step, y + offset + index,   color);
-   gimgSetValue(img, x             + step, y + offset - index,   color);
-   gimgSetValue(img, x + width - 1 - step, y + offset + index,   color);
-   gimgSetValue(img, x + width - 1 - step, y + offset - index,   color);
-   greturn;
-}
-
-/**************************************************************************************************
-func: _SetCirclePixelsOddFirst
-**************************************************************************************************/
-static void _SetCirclePixelsOddFirst(Gimg * const img, Gindex const x, Gindex const y,
-   Gindex const offset, Gcount const width, GimgValue const color)
-{
-   genter;
-   gimgSetValue(img, x + offset,    y,             color);
-   gimgSetValue(img, x + offset,    y + width - 1, color);
-   gimgSetValue(img, x,             y + offset,    color);
-   gimgSetValue(img, x + width - 1, y + offset,    color);
-   greturn;
-}

@@ -210,6 +210,7 @@ GIMG_API Gb              gimgClipLine(                Gimg       * const img, Gi
 GIMG_API Gb              gimgClipLineTest(            Gindex const denom, Gindex const num, Gr * const u1, Gr * const u2);
 
 GIMG_API Gimg           *gimgCloc_(                                           GimgType const value, Gcount const width, Gcount const height);
+GIMG_API Gimg           *gimgClocClone(               Gimg const * const img);
 GIMG_API Gb              gimgClocContent(             Gimg       * const img, GimgType const value, Gcount const width, Gcount const height);
 
 GIMG_API void            gimgDloc(                    Gimg       * const img);
@@ -225,16 +226,14 @@ GIMG_API Gb              gimgIsStarted(               void);
 GIMG_API Gimg           *gimgLoad(                    Gpath const * const filePath);
 #endif
 
-GIMG_API Gb              gimgResizeFixed_1(           Gimg const * const simage, Gimg * const dimage);
 
 GIMG_API Gb              gimgSetCircle(               Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
 GIMG_API Gb              gimgSetCircleFill(           Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
 GIMG_API Gb              gimgSetClear(                Gimg       * const img, GimgValue const color);
-GIMG_API Gb              gimgSetImage(                Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const value);
-GIMG_API Gb              gimgSetImage1(               Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const value);
-GIMG_API Gb              gimgSetImage1Blend(          Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const value);
-GIMG_API Gb              gimgSetImage1BlendA(         Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const value);
-
+GIMG_API Gb              gimgSetImage(                Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const valueImg);
+GIMG_API Gb              gimgSetImage1(               Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const valueImg);
+GIMG_API Gb              gimgSetImage1Blend(          Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const valueImg);
+GIMG_API Gb              gimgSetImage1BlendA(         Gimg       * const img, Gindex const x, Gindex const y, Gimg const * const valueImg);
 GIMG_API Gb              gimgSetLineH(                Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
 GIMG_API Gb              gimgSetLineHAlpha(           Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
 GIMG_API Gb              gimgSetLineHInterpolate(     Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color1, GimgValue const color2);
@@ -247,6 +246,7 @@ GIMG_API Gb              gimgSetRectFill(             Gimg       * const img, Gi
 GIMG_API Gb              gimgSetRectFillBlend(        Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color);
 GIMG_API Gb              gimgSetRectFillInterpolateH( Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color1, GimgValue const color2);
 GIMG_API Gb              gimgSetRectFillInterpolateV( Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, Gcount const h, GimgValue const color1, GimgValue const color2);
+GIMG_API Gb              gimgSetResizeFixed_1(        Gimg       * const img, Gimg const * const valueImg);
 GIMG_API Gb              gimgSetValue(                Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
 GIMG_API Gb              gimgStart(                   void);
 GIMG_API Gb              gimgStop(                    void);
@@ -254,6 +254,45 @@ GIMG_API Gb              gimgStop(                    void);
 GIMG_API Gb              gimgStore(                   Gimg const * const img, Gpath const * const filePath, Gr const compression);
 #endif
 GIMG_API Gb              gimgSwapColor(               Gimg       * const img, GimgValue const originalColor, GimgValue const newColor);
+
+#define gimgValueGET_K_N1(COLOR, K)                                                                \
+{                                                                                                  \
+   K = (COLOR).n1[gimgValueIndexK_K];                                                              \
+}
+
+#define gimgValueSET_K_N1(COLOR, K)                                                                \
+(                                                                                                  \
+   (COLOR).n1[gimgValueIndexK_K] = (Gn1) (K),                                                      \
+   (COLOR)                                                                                         \
+)
+
+#define gimgValueGET_KA_N1(COLOR, K, A)                                                            \
+{                                                                                                  \
+   K = (COLOR).n1[gimgValueIndexK_K];                                                              \
+   A = (COLOR).n1[gimgValueIndexK_A];                                                              \
+}
+
+#define gimgValueSET_KA_N1(COLOR, K, A)                                                            \
+(                                                                                                  \
+   (COLOR).n1[gimgValueIndexK_K] = (Gn1) (K),                                                      \
+   (COLOR).n1[gimgValueIndexK_A] = (Gn1) (A),                                                      \
+   (COLOR)                                                                                         \
+)
+
+#define gimgValueGET_RGB_N1(COLOR, R, G, B)                                                        \
+{                                                                                                  \
+   R = (COLOR).n1[gimgValueIndexRGB_R];                                                            \
+   G = (COLOR).n1[gimgValueIndexRGB_G];                                                            \
+   B = (COLOR).n1[gimgValueIndexRGB_B];                                                            \
+}
+
+#define gimgValueSET_RGB_N1(COLOR, R, G, B)                                                        \
+(                                                                                                  \
+   (COLOR).n1[gimgValueIndexRGB_R] = (Gn1) (R),                                                    \
+   (COLOR).n1[gimgValueIndexRGB_G] = (Gn1) (G),                                                    \
+   (COLOR).n1[gimgValueIndexRGB_B] = (Gn1) (B),                                                    \
+   (COLOR)                                                                                         \
+)
 
 #define gimgValueGET_RGBA_N1(COLOR, R, G, B, A)                                                    \
 {                                                                                                  \
@@ -272,24 +311,55 @@ GIMG_API Gb              gimgSwapColor(               Gimg       * const img, Gi
    (COLOR)                                                                                         \
 )
 
-#define gimgValueGET_TRANSPARENT_N1(COLOR) gimgValueSET_RGBA_N1(COLOR,   0,   0,   0,   0)
-#define gimgValueGET_BLACK_N1(COLOR)       gimgValueSET_RGBA_N1(COLOR,   0,   0,   0, 255)
-#define gimgValueGET_WHITE_N1(COLOR)       gimgValueSET_RGBA_N1(COLOR, 255, 255, 255, 255)
-#define gimgValueGET_GRAYDARK_N1(COLOR)    gimgValueSET_RGBA_N1(COLOR,  64,  64,  64, 255)
-#define gimgValueGET_GRAY_N1(COLOR)        gimgValueSET_RGBA_N1(COLOR, 128, 128, 128, 255)
-#define gimgValueGET_GRAYLIGHT_N1(COLOR)   gimgValueSET_RGBA_N1(COLOR, 192, 192, 192, 255)
-#define gimgValueGET_RED_N1(COLOR)         gimgValueSET_RGBA_N1(COLOR, 255,   0,   0, 255)
-#define gimgValueGET_ORANGE_N1(COLOR)      gimgValueSET_RGBA_N1(COLOR, 255, 128,   0, 255)
-#define gimgValueGET_YELLOW_N1(COLOR)      gimgValueSET_RGBA_N1(COLOR, 255, 255,   0, 255)
-#define gimgValueGET_GREENYELLOW_N1(COLOR) gimgValueSET_RGBA_N1(COLOR, 128, 255,   0, 255)
-#define gimgValueGET_GREEN_N1(COLOR)       gimgValueSET_RGBA_N1(COLOR,   0, 255,   0, 255)
-#define gimgValueGET_GREENCYAN_N1(COLOR)   gimgValueSET_RGBA_N1(COLOR,   0, 255, 128, 255)
-#define gimgValueGET_CYAN_N1(COLOR)        gimgValueSET_RGBA_N1(COLOR,   0, 255, 255, 255)
-#define gimgValueGET_BLUECYAN_N1(COLOR)    gimgValueSET_RGBA_N1(COLOR,   0, 128, 255, 255)
-#define gimgValueGET_BLUE_N1(COLOR)        gimgValueSET_RGBA_N1(COLOR,   0,   0, 255, 255)
-#define gimgValueGET_BLUEPURPLE_N1(COLOR)  gimgValueSET_RGBA_N1(COLOR, 128,   0, 255, 255)
-#define gimgValueGET_PURPLE_N1(COLOR)      gimgValueSET_RGBA_N1(COLOR, 255,   0, 255, 255)
-#define gimgValueGET_REDPURPLE_N1(COLOR)   gimgValueSET_RGBA_N1(COLOR, 255,   0, 128, 255)
+#define gimgValueSET_K_N1_BLACK(       COLOR)      gimgValueSET_K_N1(  COLOR,   0)
+#define gimgValueSET_K_N1_GRAYDARK(    COLOR)      gimgValueSET_K_N1(  COLOR,  64)
+#define gimgValueSET_K_N1_GRAY(        COLOR)      gimgValueSET_K_N1(  COLOR, 128)
+#define gimgValueSET_K_N1_GRAYLIGHT(   COLOR)      gimgValueSET_K_N1(  COLOR, 192)
+#define gimgValueSET_K_N1_WHITE(       COLOR)      gimgValueSET_K_N1(  COLOR, 255)
+
+#define gimgValueSET_KA_N1_TRANSPARENT(COLOR)      gimgValueSET_KA_N1(  COLOR,   0,   0)
+#define gimgValueSET_KA_N1_BLACK(      COLOR)      gimgValueSET_KA_N1(  COLOR,   0, 255)
+#define gimgValueSET_KA_N1_GRAYDARK(   COLOR)      gimgValueSET_KA_N1(  COLOR,  64, 255)
+#define gimgValueSET_KA_N1_GRAY(       COLOR)      gimgValueSET_KA_N1(  COLOR, 128, 255)
+#define gimgValueSET_KA_N1_GRAYLIGHT(  COLOR)      gimgValueSET_KA_N1(  COLOR, 192, 255)
+#define gimgValueSET_KA_N1_WHITE(      COLOR)      gimgValueSET_KA_N1(  COLOR, 255, 255)
+
+#define gimgValueSET_RGB_N1_BLACK(       COLOR)    gimgValueSET_RGB_N1( COLOR,   0,   0,   0)
+#define gimgValueSET_RGB_N1_WHITE(       COLOR)    gimgValueSET_RGB_N1( COLOR, 255, 255, 255)
+#define gimgValueSET_RGB_N1_GRAYDARK(    COLOR)    gimgValueSET_RGB_N1( COLOR,  64,  64,  64)
+#define gimgValueSET_RGB_N1_GRAY(        COLOR)    gimgValueSET_RGB_N1( COLOR, 128, 128, 128)
+#define gimgValueSET_RGB_N1_GRAYLIGHT(   COLOR)    gimgValueSET_RGB_N1( COLOR, 192, 192, 192)
+#define gimgValueSET_RGB_N1_RED(         COLOR)    gimgValueSET_RGB_N1( COLOR, 255,   0,   0)
+#define gimgValueSET_RGB_N1_ORANGE(      COLOR)    gimgValueSET_RGB_N1( COLOR, 255, 128,   0)
+#define gimgValueSET_RGB_N1_YELLOW(      COLOR)    gimgValueSET_RGB_N1( COLOR, 255, 255,   0)
+#define gimgValueSET_RGB_N1_GREENYELLOW( COLOR)    gimgValueSET_RGB_N1( COLOR, 128, 255,   0)
+#define gimgValueSET_RGB_N1_GREEN(       COLOR)    gimgValueSET_RGB_N1( COLOR,   0, 255,   0)
+#define gimgValueSET_RGB_N1_GREENCYAN(   COLOR)    gimgValueSET_RGB_N1( COLOR,   0, 255, 128)
+#define gimgValueSET_RGB_N1_CYAN(        COLOR)    gimgValueSET_RGB_N1( COLOR,   0, 255, 255)
+#define gimgValueSET_RGB_N1_BLUECYAN(    COLOR)    gimgValueSET_RGB_N1( COLOR,   0, 128, 255)
+#define gimgValueSET_RGB_N1_BLUE(        COLOR)    gimgValueSET_RGB_N1( COLOR,   0,   0, 255)
+#define gimgValueSET_RGB_N1_BLUEPURPLE(  COLOR)    gimgValueSET_RGB_N1( COLOR, 128,   0, 255)
+#define gimgValueSET_RGB_N1_PURPLE(      COLOR)    gimgValueSET_RGB_N1( COLOR, 255,   0, 255)
+#define gimgValueSET_RGB_N1_REDPURPLE(   COLOR)    gimgValueSET_RGB_N1( COLOR, 255,   0, 128)
+
+#define gimgValueSET_RGBA_N1_TRANSPARENT(COLOR)    gimgValueSET_RGBA_N1(COLOR,   0,   0,   0,   0)
+#define gimgValueSET_RGBA_N1_BLACK(      COLOR)    gimgValueSET_RGBA_N1(COLOR,   0,   0,   0, 255)
+#define gimgValueSET_RGBA_N1_WHITE(      COLOR)    gimgValueSET_RGBA_N1(COLOR, 255, 255, 255, 255)
+#define gimgValueSET_RGBA_N1_GRAYDARK(   COLOR)    gimgValueSET_RGBA_N1(COLOR,  64,  64,  64, 255)
+#define gimgValueSET_RGBA_N1_GRAY(       COLOR)    gimgValueSET_RGBA_N1(COLOR, 128, 128, 128, 255)
+#define gimgValueSET_RGBA_N1_GRAYLIGHT(  COLOR)    gimgValueSET_RGBA_N1(COLOR, 192, 192, 192, 255)
+#define gimgValueSET_RGBA_N1_RED(        COLOR)    gimgValueSET_RGBA_N1(COLOR, 255,   0,   0, 255)
+#define gimgValueSET_RGBA_N1_ORANGE(     COLOR)    gimgValueSET_RGBA_N1(COLOR, 255, 128,   0, 255)
+#define gimgValueSET_RGBA_N1_YELLOW(     COLOR)    gimgValueSET_RGBA_N1(COLOR, 255, 255,   0, 255)
+#define gimgValueSET_RGBA_N1_GREENYELLOW(COLOR)    gimgValueSET_RGBA_N1(COLOR, 128, 255,   0, 255)
+#define gimgValueSET_RGBA_N1_GREEN(      COLOR)    gimgValueSET_RGBA_N1(COLOR,   0, 255,   0, 255)
+#define gimgValueSET_RGBA_N1_GREENCYAN(  COLOR)    gimgValueSET_RGBA_N1(COLOR,   0, 255, 128, 255)
+#define gimgValueSET_RGBA_N1_CYAN(       COLOR)    gimgValueSET_RGBA_N1(COLOR,   0, 255, 255, 255)
+#define gimgValueSET_RGBA_N1_BLUECYAN(   COLOR)    gimgValueSET_RGBA_N1(COLOR,   0, 128, 255, 255)
+#define gimgValueSET_RGBA_N1_BLUE(       COLOR)    gimgValueSET_RGBA_N1(COLOR,   0,   0, 255, 255)
+#define gimgValueSET_RGBA_N1_BLUEPURPLE( COLOR)    gimgValueSET_RGBA_N1(COLOR, 128,   0, 255, 255)
+#define gimgValueSET_RGBA_N1_PURPLE(     COLOR)    gimgValueSET_RGBA_N1(COLOR, 255,   0, 255, 255)
+#define gimgValueSET_RGBA_N1_REDPURPLE(  COLOR)    gimgValueSET_RGBA_N1(COLOR, 255,   0, 128, 255)
 
 /*************************************************************************************************/
 #ifdef __cplusplus
