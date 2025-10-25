@@ -222,11 +222,6 @@ GIMG_API Gcount          gimgGetWidth(                Gimg const * const img);
 
 GIMG_API Gb              gimgIsStarted(               void);
 
-#if 0
-GIMG_API Gimg           *gimgLoad(                    Gpath const * const filePath);
-#endif
-
-
 GIMG_API Gb              gimgSetCircle(               Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
 GIMG_API Gb              gimgSetCircleFill(           Gimg       * const img, Gindex const x, Gindex const y, Gcount const w, GimgValue const color);
 GIMG_API Gb              gimgSetClear(                Gimg       * const img, GimgValue const color);
@@ -250,9 +245,6 @@ GIMG_API Gb              gimgSetResizeFixed_1(        Gimg       * const img, Gi
 GIMG_API Gb              gimgSetValue(                Gimg       * const img, Gindex const x, Gindex const y, GimgValue const value);
 GIMG_API Gb              gimgStart(                   void);
 GIMG_API Gb              gimgStop(                    void);
-#if 0
-GIMG_API Gb              gimgStore(                   Gimg const * const img, Gpath const * const filePath, Gr const compression);
-#endif
 GIMG_API Gb              gimgSwapColor(               Gimg       * const img, GimgValue const originalColor, GimgValue const newColor);
 
 #define gimgValueGET_K_N1(COLOR, K)                                                                \
