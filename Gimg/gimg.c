@@ -513,7 +513,7 @@ GIMG_API void gimgDloc(Gimg * const img)
 {
    genter;
 
-   greturnVoidIf(
+   greturnIf(
       !_isStarted ||
       !img);
 
@@ -531,7 +531,7 @@ GIMG_API void gimgDlocContent(Gimg * const img)
 {
    genter;
 
-   greturnVoidIf(
+   greturnIf(
       !_isStarted ||
       !img);
 
@@ -638,7 +638,7 @@ GIMG_API Gb gimgSetCircle(Gimg * const img, Gindex const inx, Gindex const iny, 
 
    greturnFalseIf(w <= 0);
 
-   greturnIf(w == 1, gimgSetValue(img, inx, iny, color));
+   greturnValIf(w == 1, gimgSetValue(img, inx, iny, color));
 
    // Dealing with an odd width.  Symetric around a central pixel.
    //     +---------------+ w (3, 5, 7, ...)
@@ -830,7 +830,7 @@ GIMG_API Gb gimgSetCircleFill(Gimg * const img, Gindex const inx, Gindex const i
 
    greturnFalseIf(w <= 0);
 
-   greturnIf(w == 1, gimgSetValue(img, inx, iny, color));
+   greturnValIf(w == 1, gimgSetValue(img, inx, iny, color));
 
    // Dealing with an odd width.  Symetric around a central pixel.
    //     +---------------+ w (3, 5, 7, ...)
